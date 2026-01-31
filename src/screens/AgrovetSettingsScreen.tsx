@@ -17,6 +17,13 @@ export function AgrovetSettingsScreen() {
     loadJson('signup:agrovet', profile).then(setProfile);
   }, []);
 
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { colors } from '../theme/colors';
+
+export function AgrovetSettingsScreen() {
   return (
     <ScreenContainer>
       <Text style={styles.title}>Settings</Text>

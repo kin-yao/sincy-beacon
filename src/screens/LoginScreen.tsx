@@ -5,6 +5,10 @@ import { ScreenContainer } from '../components/ScreenContainer';
 import { SectionCard } from '../components/SectionCard';
 import { TextField } from '../components/TextField';
 import { loadJson, saveJson } from '../storage/localStorage';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
 import { colors } from '../theme/colors';
 
 type LoginScreenProps = {

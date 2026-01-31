@@ -23,6 +23,13 @@ export function FarmerVerifyScreen() {
     await saveJson('verification:history', next);
   };
 
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { colors } from '../theme/colors';
+
+export function FarmerVerifyScreen() {
   return (
     <ScreenContainer>
       <Text style={styles.title}>Verify Product</Text>
