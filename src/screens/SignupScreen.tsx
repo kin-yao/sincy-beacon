@@ -1,8 +1,10 @@
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type SignupScreenProps = {
   role: 'farmer' | 'agrovet';
@@ -10,58 +12,176 @@ type SignupScreenProps = {
 };
 
 export function SignupScreen({ role, onContinue }: SignupScreenProps) {
+  const navigation = useNavigation();
+  const { colors } = useAppTheme();
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const roleLabel = role === 'farmer' ? 'Farmer' : 'Agrovet';
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Create your {role} profile</Text>
-      {role === 'farmer' ? (
-        <>
-          <SectionCard title="Farmer registration">
-            <Text style={styles.bodyText}>Capture National ID, phone number, and select SACCO.</Text>
-          </SectionCard>
-          <SectionCard title="Verification">
-            <Text style={styles.bodyText}>Scan a sample barcode to verify the local cache is ready.</Text>
-          </SectionCard>
-          <SectionCard title="Finish setup">
-            <Text style={styles.bodyText}>Complete onboarding to start verifying products.</Text>
-            <Text style={styles.link} onPress={onContinue}>
-              Continue to dashboard
-            </Text>
-          </SectionCard>
-        </>
-      ) : (
-        <>
-          <SectionCard title="Agrovet onboarding">
-            <Text style={styles.bodyText}>Provide store name, business license, and location.</Text>
-          </SectionCard>
-          <SectionCard title="Inventory setup">
-            <Text style={styles.bodyText}>Sync inventory batches for instant authenticity checks.</Text>
-          </SectionCard>
-          <SectionCard title="Finish setup">
-            <Text style={styles.bodyText}>Invite your first farmer once onboarding is complete.</Text>
-            <Text style={styles.link} onPress={onContinue}>
-              Continue to dashboard
-            </Text>
-          </SectionCard>
-        </>
-      )}
+      <Pressable onPress={() => navigation.goBack()} style={styles.back}>
+        <Text style={[styles.backText, { color: colors.grayMuted }]}>← Back</Text>
+      </Pressable>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>Create {roleLabel} Account</Text>
+        <Text style={[styles.subtitle, { color: colors.grayMuted }]}>
+          Join Sincy to verify authentic inputs
+        </Text>
+      </View>
+      <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
+          <TextInput
+            placeholder="e.g., Jane Kipchoge"
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text }]}
+            placeholderTextColor={colors.grayMedium}
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>Phone Number</Text>
+          <TextInput
+            placeholder="+254 7XX XXX XXX"
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text }]}
+            placeholderTextColor={colors.grayMedium}
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>National ID</Text>
+          <TextInput
+            placeholder="12345678"
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text }]}
+            placeholderTextColor={colors.grayMedium}
+          />
+        </View>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>Select SACCO</Text>
+          <View style={[styles.select, { borderColor: colors.border, backgroundColor: colors.grayLight }]}>
+            <Text style={[styles.selectText, { color: colors.grayMuted }]}>-- Choose your SACCO --</Text>
+            <Ionicons name="chevron-down" size={18} color={colors.grayMuted} />
+          </View>
+        </View>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>Create PIN (4 digits)</Text>
+          <TextInput
+            placeholder="••••"
+            style={[styles.input, { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text }]}
+            placeholderTextColor={colors.grayMedium}
+            secureTextEntry
+          />
+        </View>
+        <Pressable style={styles.checkboxRow} onPress={() => setAcceptedTerms((prev) => !prev)}>
+          <View
+            style={[
+              styles.checkbox,
+              { borderColor: colors.grayMedium, backgroundColor: colors.card },
+              acceptedTerms && [styles.checkboxChecked, { backgroundColor: colors.green, borderColor: colors.green }],
+            ]}
+          >
+            {acceptedTerms ? <Ionicons name="checkmark" size={14} color={colors.white} /> : null}
+          </View>
+          <Text style={[styles.checkboxText, { color: colors.grayMuted }]}>
+            I agree to the Terms of Service and Privacy Policy
+          </Text>
+        </Pressable>
+        <PrimaryButton label="Create Account" onPress={onContinue} />
+        <View style={styles.dividerRow}>
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          <Text style={[styles.dividerText, { color: colors.grayMuted }]}>or register via USSD</Text>
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        </View>
+        <View style={[styles.ussdCard, { borderColor: colors.border }]}>
+          <Text style={[styles.ussdText, { color: colors.text }]}>Dial *920# for USSD Registration</Text>
+        </View>
+      </View>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  back: {
+    alignSelf: 'flex-start',
+  },
+  backText: {
+    fontSize: 14,
+  },
+  header: {
+    alignItems: 'center',
+    gap: 6,
+  },
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  subtitle: {
+    fontSize: 13,
   },
-  link: {
-    marginTop: 8,
-    fontSize: 14,
+  formCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 12,
     fontWeight: '600',
-    color: colors.green,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  select: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectText: {
+    fontSize: 13,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderWidth: 1,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {},
+  checkboxText: {
+    fontSize: 12,
+    flex: 1,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    fontSize: 11,
+  },
+  ussdCard: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  ussdText: {
+    fontSize: 12,
   },
 });

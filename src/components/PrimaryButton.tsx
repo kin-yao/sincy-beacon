@@ -1,27 +1,39 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors } from '../theme/colors';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useAppTheme } from '../theme/theme';
 
 type PrimaryButtonProps = {
   label: string;
   onPress: () => void;
   variant?: 'primary' | 'outline';
+  icon?: React.ReactNode;
 };
 
-export function PrimaryButton({ label, onPress, variant = 'primary' }: PrimaryButtonProps) {
+export function PrimaryButton({ label, onPress, variant = 'primary', icon }: PrimaryButtonProps) {
+  const { colors } = useAppTheme();
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        variant === 'primary' ? styles.primary : styles.outline,
+        variant === 'primary'
+          ? [styles.primary, { backgroundColor: colors.green }]
+          : [styles.outline, { borderColor: colors.green, backgroundColor: colors.card }],
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.label, variant === 'primary' ? styles.labelPrimary : styles.labelOutline]}>
-        {label}
-      </Text>
+      <View style={styles.content}>
+        {icon ? <View style={styles.icon}>{icon}</View> : null}
+        <Text
+          style={[
+            styles.label,
+            variant === 'primary' ? { color: colors.white } : { color: colors.green },
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -35,13 +47,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 6,
   },
-  primary: {
-    backgroundColor: colors.green,
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
+  icon: {
+    marginRight: 4,
+  },
+  primary: {},
   outline: {
     borderWidth: 2,
-    borderColor: colors.green,
-    backgroundColor: colors.white,
   },
   pressed: {
     opacity: 0.8,
@@ -49,11 +65,5 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  labelPrimary: {
-    color: colors.white,
-  },
-  labelOutline: {
-    color: colors.green,
   },
 });

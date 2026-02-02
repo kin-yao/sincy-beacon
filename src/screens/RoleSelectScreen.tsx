@@ -1,25 +1,43 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type RoleSelectScreenProps = {
   onSelectRole: (role: 'farmer' | 'agrovet') => void;
 };
 
 export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
+  const { colors } = useAppTheme();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome to Sincy</Text>
-        <Text style={styles.subtitle}>Verify genuine agricultural inputs in seconds.</Text>
+        <View style={[styles.logoBadge, { backgroundColor: colors.greenPale }]}>
+          <Ionicons name="flash-outline" size={28} color={colors.greenDark} />
+        </View>
+        <Text style={[styles.title, { color: colors.text }]}>Sincy</Text>
+        <Text style={[styles.subtitle, { color: colors.grayMuted }]}>Verify authentic agricultural inputs</Text>
       </View>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Choose your role</Text>
-        <PrimaryButton label="I am a Farmer" onPress={() => onSelectRole('farmer')} />
-        <PrimaryButton label="I am an Agrovet/Retailer" onPress={() => onSelectRole('agrovet')} />
+      <View style={[styles.card, { backgroundColor: colors.card, shadowColor: colors.grayDark }]}>
+        <PrimaryButton
+          label="I'm a Farmer"
+          onPress={() => onSelectRole('farmer')}
+          icon={<MaterialCommunityIcons name="cube-outline" size={18} color={colors.white} />}
+        />
+        <PrimaryButton
+          label="I'm an Agrovet"
+          onPress={() => onSelectRole('agrovet')}
+          variant="outline"
+          icon={<Ionicons name="storefront-outline" size={18} color={colors.green} />}
+        />
       </View>
-      <Text style={styles.footer}>Offline-first verification • Secure SACCO payments</Text>
+      <View style={[styles.callout, { backgroundColor: colors.redLight, borderColor: colors.danger }]}>
+        <Text style={[styles.calloutText, { color: colors.text }]}>
+          <Text style={styles.calloutEm}>How it works:</Text> Scan barcodes to verify authenticity and
+          build trust in your supply chain.
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -27,36 +45,45 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.grayLight,
     padding: 24,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 24,
   },
   header: {
-    marginTop: 20,
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: colors.greenDark,
-    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    color: colors.grayDark,
+    fontSize: 13,
   },
   card: {
-    backgroundColor: colors.white,
-    padding: 20,
-    borderRadius: 16,
+    padding: 18,
+    borderRadius: 18,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: colors.grayDark,
+  callout: {
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
   },
-  footer: {
+  calloutText: {
+    fontSize: 12,
     textAlign: 'center',
-    color: colors.grayDark,
+  },
+  calloutEm: {
+    fontWeight: '700',
   },
 });
