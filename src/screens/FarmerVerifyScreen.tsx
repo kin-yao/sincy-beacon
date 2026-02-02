@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -23,13 +23,6 @@ export function FarmerVerifyScreen() {
     await saveJson('verification:history', next);
   };
 
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
-
-export function FarmerVerifyScreen() {
   return (
     <ScreenContainer>
       <Text style={styles.title}>Verify Product</Text>

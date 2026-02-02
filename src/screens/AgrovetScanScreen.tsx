@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
@@ -29,13 +29,6 @@ export function AgrovetScanScreen() {
     await saveJson('agrovet:lastProduct', { barcode: productBarcode, name: productName });
   };
 
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
-
-export function AgrovetScanScreen() {
   return (
     <ScreenContainer>
       <Text style={styles.title}>Scan & Verify</Text>
@@ -78,9 +71,6 @@ export function AgrovetScanScreen() {
           <TextField label="Product name" value={productName} onChangeText={setProductName} />
           <PrimaryButton label="Save product" onPress={handleSaveProduct} />
         </View>
-      </SectionCard>
-      <SectionCard title="Product verification">
-        <Text style={styles.bodyText}>Authenticate barcodes and record transactions instantly.</Text>
       </SectionCard>
     </ScreenContainer>
   );
