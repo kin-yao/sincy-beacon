@@ -5,15 +5,6 @@ import { AppHeader } from '../components/AppHeader';
 import { colors } from '../theme/colors';
 
 export function FarmerAlertsScreen() {
-  const { colors } = useAppTheme();
-  const tabs = [
-    { label: 'Home', route: 'Home', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
-    { label: 'Verify', route: 'Verify', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
-    { label: 'Products', route: 'Products', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
-    { label: 'Alerts', route: 'Alerts', icon: (color: string) => <Ionicons name="notifications-outline" size={16} color={color} /> },
-    { label: 'Payments', route: 'Payments', icon: (color: string) => <Ionicons name="card-outline" size={16} color={color} /> },
-    { label: 'Profile', route: 'Profile', icon: (color: string) => <Ionicons name="person-outline" size={16} color={color} /> },
-  ];
   return (
     <View style={styles.screen}>
       <AppHeader title="Sincy Farmer" subtitle="Jane Kipchoge" onLogout={() => {}} />
@@ -74,6 +65,7 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 13,
     fontWeight: '700',
+    color: colors.grayDark,
   },
   alertText: {
     fontSize: 11,

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 type AuthChoiceScreenProps = {
   role: 'farmer' | 'agrovet';
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
+    color: colors.grayDark,
   },
   subtitle: {
     fontSize: 14,
