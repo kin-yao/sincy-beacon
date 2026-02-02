@@ -1,5 +1,6 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { colors } from '../theme/colors';
 
@@ -11,15 +12,31 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome to Sincy</Text>
-        <Text style={styles.subtitle}>Verify genuine agricultural inputs in seconds.</Text>
+        <View style={styles.logoBadge}>
+          <Ionicons name="flash-outline" size={28} color={colors.greenDark} />
+        </View>
+        <Text style={styles.title}>Sincy</Text>
+        <Text style={styles.subtitle}>Verify authentic agricultural inputs</Text>
       </View>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Choose your role</Text>
-        <PrimaryButton label="I am a Farmer" onPress={() => onSelectRole('farmer')} />
-        <PrimaryButton label="I am an Agrovet/Retailer" onPress={() => onSelectRole('agrovet')} />
+        <PrimaryButton
+          label="I'm a Farmer"
+          onPress={() => onSelectRole('farmer')}
+          icon={<MaterialCommunityIcons name="cube-outline" size={18} color={colors.white} />}
+        />
+        <PrimaryButton
+          label="I'm an Agrovet"
+          onPress={() => onSelectRole('agrovet')}
+          variant="outline"
+          icon={<Ionicons name="storefront-outline" size={18} color={colors.green} />}
+        />
       </View>
-      <Text style={styles.footer}>Offline-first verification • Secure SACCO payments</Text>
+      <View style={styles.callout}>
+        <Text style={styles.calloutText}>
+          <Text style={styles.calloutEm}>How it works:</Text> Scan barcodes to verify authenticity and
+          build trust in your supply chain.
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -29,34 +46,52 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.grayLight,
     padding: 24,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 24,
   },
   header: {
-    marginTop: 20,
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.greenPale,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    color: colors.greenDark,
-    marginBottom: 8,
+    color: colors.grayDark,
   },
   subtitle: {
-    fontSize: 16,
-    color: colors.grayDark,
+    fontSize: 13,
+    color: colors.grayMuted,
   },
   card: {
     backgroundColor: colors.white,
-    padding: 20,
-    borderRadius: 16,
+    padding: 18,
+    borderRadius: 18,
+    shadowColor: colors.grayDark,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
+  callout: {
+    backgroundColor: colors.redLight,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F2B8BD',
+  },
+  calloutText: {
+    fontSize: 12,
     color: colors.grayDark,
-  },
-  footer: {
     textAlign: 'center',
-    color: colors.grayDark,
+  },
+  calloutEm: {
+    fontWeight: '700',
   },
 });

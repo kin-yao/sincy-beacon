@@ -1,31 +1,76 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { AppHeader } from '../components/AppHeader';
 import { colors } from '../theme/colors';
 
 export function AgrovetFarmersScreen() {
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Farmer Records</Text>
-      <SectionCard title="Verified network">
-        <Text style={styles.bodyText}>Review all farmers verified through your store.</Text>
-      </SectionCard>
-      <SectionCard title="SACCO link">
-        <Text style={styles.bodyText}>Share farmer data with SACCOs for credit processing.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={styles.screen}>
+      <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
+      <View style={styles.content}>
+        <View style={styles.farmerCard}>
+          <View style={styles.avatar}>
+            <Ionicons name="location-outline" size={16} color={colors.green} />
+          </View>
+          <View style={styles.farmerBody}>
+            <Text style={styles.farmerName}>Jane Kipchoge</Text>
+            <Text style={styles.farmerMeta}>Nakuru · 12 verifications</Text>
+          </View>
+          <Ionicons name="eye-outline" size={16} color={colors.grayMuted} />
+        </View>
+        <View style={styles.farmerCard}>
+          <View style={styles.avatar}>
+            <Ionicons name="location-outline" size={16} color={colors.green} />
+          </View>
+          <View style={styles.farmerBody}>
+            <Text style={styles.farmerName}>Samuel Kiplagat</Text>
+            <Text style={styles.farmerMeta}>Eldoret · 8 verifications</Text>
+          </View>
+          <Ionicons name="eye-outline" size={16} color={colors.grayMuted} />
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
+  screen: {
+    flex: 1,
+    backgroundColor: colors.grayLight,
+  },
+  content: {
+    padding: 16,
+    gap: 12,
+  },
+  farmerCard: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.greenLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  farmerBody: {
+    flex: 1,
+  },
+  farmerName: {
+    fontSize: 13,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  farmerMeta: {
+    fontSize: 11,
+    color: colors.grayMuted,
   },
 });
