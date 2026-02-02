@@ -62,14 +62,25 @@ export function LoginScreen({ role, onContinue }: LoginScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  back: {
+    alignSelf: 'flex-start',
+  },
+  backText: {
+    color: colors.grayMuted,
+    fontSize: 14,
+  },
+  header: {
+    alignItems: 'center',
+    gap: 6,
+  },
   title: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  subtitle: {
+    fontSize: 13,
+    color: colors.grayMuted,
   },
   form: {
     marginTop: 12,
@@ -83,6 +94,32 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.green,
+    color: colors.grayDark,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: colors.grayLight,
+    color: colors.grayDark,
+  },
+  ussdCard: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  ussdTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.grayDark,
+  },
+  ussdText: {
+    fontSize: 12,
+    color: colors.grayMuted,
+    marginTop: 4,
   },
 });

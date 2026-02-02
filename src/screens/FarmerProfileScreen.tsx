@@ -30,14 +30,45 @@ export function FarmerProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
+  screen: {
+    flex: 1,
+    backgroundColor: colors.grayLight,
+  },
+  content: {
+    padding: 16,
+  },
+  profileCard: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 12,
+  },
+  profileTitle: {
+    fontSize: 15,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
+  profileSubtitle: {
+    fontSize: 12,
+    color: colors.grayMuted,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 8,
+  },
+  profileLabel: {
+    fontSize: 12,
+    color: colors.grayMuted,
+  },
+  profileValue: {
+    fontSize: 12,
     color: colors.grayDark,
+    fontWeight: '600',
   },
   detailText: {
     fontSize: 13,

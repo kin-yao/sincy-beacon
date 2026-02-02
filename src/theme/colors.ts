@@ -1,10 +1,15 @@
 export const colors = {
   green: '#1D7A3E',
   greenDark: '#0F5A2A',
+  greenLight: '#E8F3EC',
+  greenPale: '#DCEBDF',
   yellow: '#F2C94C',
-  grayLight: '#F5F5F5',
-  grayMedium: '#C4C4C4',
-  grayDark: '#333333',
+  redLight: '#FCE8EA',
+  grayLight: '#F5F6F8',
+  grayMedium: '#B0B8C1',
+  grayDark: '#1B1F23',
+  grayMuted: '#6B7280',
+  border: '#E3E8EF',
   white: '#FFFFFF',
   danger: '#E63946',
 };

@@ -132,14 +132,25 @@ export function SignupScreen({ role, onContinue }: SignupScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  back: {
+    alignSelf: 'flex-start',
+  },
+  backText: {
+    color: colors.grayMuted,
+    fontSize: 14,
+  },
+  header: {
+    alignItems: 'center',
+    gap: 6,
+  },
   title: {
     fontSize: 22,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  subtitle: {
+    fontSize: 13,
+    color: colors.grayMuted,
   },
   form: {
     marginTop: 12,
@@ -153,6 +164,79 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     fontWeight: '600',
-    color: colors.green,
+    color: colors.grayDark,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: colors.grayLight,
+    color: colors.grayDark,
+  },
+  select: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: colors.grayLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectText: {
+    color: colors.grayMuted,
+    fontSize: 13,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderWidth: 1,
+    borderColor: colors.grayMedium,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+  },
+  checkboxChecked: {
+    backgroundColor: colors.green,
+    borderColor: colors.green,
+  },
+  checkboxText: {
+    fontSize: 12,
+    color: colors.grayMuted,
+    flex: 1,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    fontSize: 11,
+    color: colors.grayMuted,
+  },
+  ussdCard: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  ussdText: {
+    fontSize: 12,
+    color: colors.grayDark,
   },
 });

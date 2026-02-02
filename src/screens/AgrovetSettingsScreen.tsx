@@ -35,14 +35,45 @@ export function AgrovetSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
+  screen: {
+    flex: 1,
+    backgroundColor: colors.grayLight,
+  },
+  content: {
+    padding: 16,
+  },
+  settingsCard: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 12,
+  },
+  cardTitle: {
+    fontSize: 15,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
+  cardSubtitle: {
+    fontSize: 12,
+    color: colors.grayMuted,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 8,
+  },
+  label: {
+    fontSize: 12,
+    color: colors.grayMuted,
+  },
+  value: {
+    fontSize: 12,
     color: colors.grayDark,
+    fontWeight: '600',
   },
   detailText: {
     fontSize: 13,

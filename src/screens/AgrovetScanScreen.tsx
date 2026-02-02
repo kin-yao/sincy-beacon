@@ -77,13 +77,67 @@ export function AgrovetScanScreen() {
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.grayLight,
+  },
+  content: {
+    padding: 16,
+    gap: 12,
+  },
+  centerCard: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    gap: 10,
+  },
+  cameraIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.greenLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.grayDark,
   },
-  bodyText: {
-    fontSize: 14,
+  subtitle: {
+    fontSize: 12,
+    color: colors.grayMuted,
+    textAlign: 'center',
+  },
+  manualTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.grayDark,
+    marginTop: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: colors.white,
+    color: colors.grayDark,
+  },
+  searchButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: colors.white,
+  },
+  searchText: {
+    fontSize: 13,
+    fontWeight: '600',
     color: colors.grayDark,
   },
   form: {
