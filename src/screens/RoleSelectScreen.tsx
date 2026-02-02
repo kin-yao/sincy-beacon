@@ -2,15 +2,16 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type RoleSelectScreenProps = {
   onSelectRole: (role: 'farmer' | 'agrovet') => void;
 };
 
 export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
+  const { colors } = useAppTheme();
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.logoBadge}>
           <Ionicons name="flash-outline" size={28} color={colors.greenDark} />
@@ -44,7 +45,6 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.grayLight,
     padding: 24,
     justifyContent: 'center',
     gap: 24,

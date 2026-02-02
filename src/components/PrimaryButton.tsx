@@ -16,7 +16,9 @@ export function PrimaryButton({ label, onPress, variant = 'primary', icon }: Pri
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        variant === 'primary' ? styles.primary : styles.outline,
+        variant === 'primary'
+          ? [styles.primary, { backgroundColor: colors.green }]
+          : [styles.outline, { borderColor: colors.green, backgroundColor: colors.card }],
         pressed && styles.pressed,
       ]}
     >
@@ -50,10 +52,9 @@ const styles = StyleSheet.create({
   primary: {
     backgroundColor: colors.green,
   },
+  primary: {},
   outline: {
     borderWidth: 2,
-    borderColor: colors.green,
-    backgroundColor: colors.white,
   },
   pressed: {
     opacity: 0.8,
@@ -61,11 +62,5 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  labelPrimary: {
-    color: colors.white,
-  },
-  labelOutline: {
-    color: colors.green,
   },
 });

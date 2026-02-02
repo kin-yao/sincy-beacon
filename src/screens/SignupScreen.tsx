@@ -146,7 +146,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   subtitle: {
     fontSize: 13,
@@ -160,9 +159,17 @@ const styles = StyleSheet.create({
     color: colors.greenDark,
     fontSize: 13,
   },
-  link: {
-    marginTop: 8,
-    fontSize: 14,
+  formCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 12,
     fontWeight: '600',
     color: colors.grayDark,
   },

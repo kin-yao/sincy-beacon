@@ -5,6 +5,15 @@ import { AppHeader } from '../components/AppHeader';
 import { colors } from '../theme/colors';
 
 export function AgrovetReportsScreen() {
+  const { colors } = useAppTheme();
+  const tabs = [
+    { label: 'Dashboard', route: 'Dashboard', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
+    { label: 'Verify', route: 'Scan', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
+    { label: 'Inventory', route: 'Inventory', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
+    { label: 'Farmers', route: 'Farmers', icon: (color: string) => <Ionicons name="people-outline" size={16} color={color} /> },
+    { label: 'Reports', route: 'Reports', icon: (color: string) => <Ionicons name="analytics-outline" size={16} color={color} /> },
+    { label: 'Settings', route: 'Settings', icon: (color: string) => <Ionicons name="settings-outline" size={16} color={color} /> },
+  ];
   return (
     <View style={styles.screen}>
       <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
@@ -62,7 +71,6 @@ const styles = StyleSheet.create({
   reportTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   reportMeta: {
     fontSize: 11,

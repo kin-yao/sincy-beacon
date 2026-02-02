@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   cardSubtitle: {
     fontSize: 12,

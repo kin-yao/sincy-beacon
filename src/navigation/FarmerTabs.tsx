@@ -7,7 +7,7 @@ import { FarmerPaymentsScreen } from '../screens/FarmerPaymentsScreen';
 import { FarmerProductsScreen } from '../screens/FarmerProductsScreen';
 import { FarmerProfileScreen } from '../screens/FarmerProfileScreen';
 import { FarmerVerifyScreen } from '../screens/FarmerVerifyScreen';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 export type FarmerTabParamList = {
   Home: undefined;
@@ -21,6 +21,7 @@ export type FarmerTabParamList = {
 const Tab = createBottomTabNavigator<FarmerTabParamList>();
 
 export function FarmerTabs() {
+  const { colors } = useAppTheme();
   return (
     <Tab.Navigator
       screenOptions={{
