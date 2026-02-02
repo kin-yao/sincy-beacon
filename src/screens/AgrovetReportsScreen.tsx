@@ -1,9 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
-import { TopNavBar } from '../components/TopNavBar';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 export function AgrovetReportsScreen() {
   const { colors } = useAppTheme();
@@ -16,26 +15,25 @@ export function AgrovetReportsScreen() {
     { label: 'Settings', route: 'Settings', icon: (color: string) => <Ionicons name="settings-outline" size={16} color={color} /> },
   ];
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
-      <TopNavBar tabs={tabs} />
       <View style={styles.content}>
-        <View style={[styles.reportCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.reportIcon, { backgroundColor: colors.greenLight }]}>
+        <View style={styles.reportCard}>
+          <View style={styles.reportIcon}>
             <Ionicons name="bar-chart-outline" size={18} color={colors.green} />
           </View>
           <View>
-            <Text style={[styles.reportTitle, { color: colors.text }]}>Verification Analytics</Text>
-            <Text style={[styles.reportMeta, { color: colors.grayMuted }]}>Track genuine vs counterfeit attempts.</Text>
+            <Text style={styles.reportTitle}>Verification Analytics</Text>
+            <Text style={styles.reportMeta}>Track genuine vs counterfeit attempts.</Text>
           </View>
         </View>
-        <View style={[styles.reportCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.reportIcon, { backgroundColor: colors.greenLight }]}>
+        <View style={styles.reportCard}>
+          <View style={styles.reportIcon}>
             <Ionicons name="document-text-outline" size={18} color={colors.green} />
           </View>
           <View>
-            <Text style={[styles.reportTitle, { color: colors.text }]}>Sales Reports</Text>
-            <Text style={[styles.reportMeta, { color: colors.grayMuted }]}>Export daily and monthly summaries.</Text>
+            <Text style={styles.reportTitle}>Sales Reports</Text>
+            <Text style={styles.reportMeta}>Export daily and monthly summaries.</Text>
           </View>
         </View>
       </View>
@@ -46,15 +44,18 @@ export function AgrovetReportsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
     gap: 12,
   },
   reportCard: {
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    backgroundColor: colors.greenLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -72,5 +74,6 @@ const styles = StyleSheet.create({
   },
   reportMeta: {
     fontSize: 11,
+    color: colors.grayMuted,
   },
 });

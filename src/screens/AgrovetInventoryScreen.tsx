@@ -1,9 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
-import { TopNavBar } from '../components/TopNavBar';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 export function AgrovetInventoryScreen() {
   const { colors } = useAppTheme();
@@ -16,33 +15,26 @@ export function AgrovetInventoryScreen() {
     { label: 'Settings', route: 'Settings', icon: (color: string) => <Ionicons name="settings-outline" size={16} color={color} /> },
   ];
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
-      <TopNavBar tabs={tabs} />
       <View style={styles.content}>
-        <View style={[styles.stockCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.stockCard}>
           <View style={styles.stockHeader}>
-            <Text style={[styles.stockTitle, { color: colors.text }]}>NPK 23:23:0 Fertilizer</Text>
+            <Text style={styles.stockTitle}>NPK 23:23:0 Fertilizer</Text>
             <Ionicons name="checkmark-circle" size={18} color={colors.green} />
           </View>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Batch: KEN-2024-521</Text>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Stock: 120 units</Text>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Expires: Dec 2025</Text>
+          <Text style={styles.stockMeta}>Batch: KEN-2024-521</Text>
+          <Text style={styles.stockMeta}>Stock: 120 units</Text>
+          <Text style={styles.stockMeta}>Expires: Dec 2025</Text>
         </View>
-        <View
-          style={[
-            styles.stockCard,
-            styles.lowStock,
-            { backgroundColor: colors.card, borderColor: colors.border, borderLeftColor: colors.danger },
-          ]}
-        >
+        <View style={[styles.stockCard, styles.lowStock]}> 
           <View style={styles.stockHeader}>
-            <Text style={[styles.stockTitle, { color: colors.text }]}>Hybrid Maize Seeds</Text>
+            <Text style={styles.stockTitle}>Hybrid Maize Seeds</Text>
             <Ionicons name="alert-circle" size={18} color={colors.danger} />
           </View>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Batch: HBR-103-2024</Text>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Stock: 8 units</Text>
-          <Text style={[styles.stockMeta, { color: colors.grayMuted }]}>Action: Reorder Soon</Text>
+          <Text style={styles.stockMeta}>Batch: HBR-103-2024</Text>
+          <Text style={styles.stockMeta}>Stock: 8 units</Text>
+          <Text style={styles.stockMeta}>Action: Reorder Soon</Text>
         </View>
       </View>
     </View>
@@ -52,19 +44,23 @@ export function AgrovetInventoryScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
     gap: 12,
   },
   stockCard: {
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
+    borderColor: colors.border,
     gap: 6,
   },
   lowStock: {
     borderLeftWidth: 4,
+    borderLeftColor: colors.danger,
   },
   stockHeader: {
     flexDirection: 'row',
@@ -77,5 +73,6 @@ const styles = StyleSheet.create({
   },
   stockMeta: {
     fontSize: 11,
+    color: colors.grayMuted,
   },
 });

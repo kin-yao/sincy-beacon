@@ -1,59 +1,48 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { AppHeader } from '../components/AppHeader';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { TopNavBar } from '../components/TopNavBar';
-import { useAppTheme } from '../theme/theme';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { loadJson } from '../storage/localStorage';
+import { colors } from '../theme/colors';
 
 export function FarmerProfileScreen() {
-  const { colors } = useAppTheme();
-  const tabs = [
-    { label: 'Home', route: 'Home', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
-    { label: 'Verify', route: 'Verify', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
-    { label: 'Products', route: 'Products', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
-    { label: 'Alerts', route: 'Alerts', icon: (color: string) => <Ionicons name="notifications-outline" size={16} color={color} /> },
-    { label: 'Payments', route: 'Payments', icon: (color: string) => <Ionicons name="card-outline" size={16} color={color} /> },
-    { label: 'Profile', route: 'Profile', icon: (color: string) => <Ionicons name="person-outline" size={16} color={color} /> },
-  ];
+  const [profile, setProfile] = useState({ name: '', nid: '', phone: '', sacco: '' });
+
+  useEffect(() => {
+    loadJson('signup:farmer', profile).then(setProfile);
+  }, []);
+
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <AppHeader title="Sincy Farmer" subtitle="Jane Kipchoge" onLogout={() => {}} />
-      <TopNavBar tabs={tabs} />
-      <View style={styles.content}>
-        <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.profileTitle, { color: colors.text }]}>Sincy Farmer</Text>
-          <Text style={[styles.profileSubtitle, { color: colors.grayMuted }]}>Kagema SACCO Member</Text>
-          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>Location</Text>
-            <Text style={[styles.profileValue, { color: colors.text }]}>Nakuru Town</Text>
-          </View>
-          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>National ID</Text>
-            <Text style={[styles.profileValue, { color: colors.text }]}>12345678</Text>
-          </View>
-          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
-            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>Language</Text>
-            <Text style={[styles.profileValue, { color: colors.text }]}>English</Text>
-          </View>
-          <PrimaryButton label="Logout" onPress={() => {}} variant="outline" />
-        </View>
-      </View>
-    </View>
+    <ScreenContainer>
+      <Text style={styles.title}>Profile</Text>
+      <SectionCard title="Farmer details">
+        <Text style={styles.bodyText}>National ID, phone, and SACCO membership information.</Text>
+        <Text style={styles.detailText}>Name: {profile.name || 'Not set'}</Text>
+        <Text style={styles.detailText}>National ID: {profile.nid || 'Not set'}</Text>
+        <Text style={styles.detailText}>Phone: {profile.phone || 'Not set'}</Text>
+        <Text style={styles.detailText}>SACCO: {profile.sacco || 'Not set'}</Text>
+      </SectionCard>
+      <SectionCard title="Security">
+        <Text style={styles.bodyText}>Change PIN and manage device access.</Text>
+      </SectionCard>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
   },
   profileCard: {
+    backgroundColor: colors.white,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
+    borderColor: colors.border,
     gap: 12,
   },
   profileTitle: {
@@ -62,18 +51,27 @@ const styles = StyleSheet.create({
   },
   profileSubtitle: {
     fontSize: 12,
+    color: colors.grayMuted,
   },
   profileRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
+    borderBottomColor: colors.border,
     paddingVertical: 8,
   },
   profileLabel: {
     fontSize: 12,
+    color: colors.grayMuted,
   },
   profileValue: {
     fontSize: 12,
+    color: colors.grayDark,
     fontWeight: '600',
+  },
+  detailText: {
+    fontSize: 13,
+    color: colors.grayDark,
+    marginTop: 6,
   },
 });

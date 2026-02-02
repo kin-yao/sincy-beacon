@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 type PrimaryButtonProps = {
   label: string;
@@ -10,7 +10,6 @@ type PrimaryButtonProps = {
 };
 
 export function PrimaryButton({ label, onPress, variant = 'primary', icon }: PrimaryButtonProps) {
-  const { colors } = useAppTheme();
   return (
     <Pressable
       accessibilityRole="button"
@@ -25,12 +24,7 @@ export function PrimaryButton({ label, onPress, variant = 'primary', icon }: Pri
     >
       <View style={styles.content}>
         {icon ? <View style={styles.icon}>{icon}</View> : null}
-        <Text
-          style={[
-            styles.label,
-            variant === 'primary' ? { color: colors.white } : { color: colors.green },
-          ]}
-        >
+        <Text style={[styles.label, variant === 'primary' ? styles.labelPrimary : styles.labelOutline]}>
           {label}
         </Text>
       </View>
@@ -54,6 +48,9 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 4,
+  },
+  primary: {
+    backgroundColor: colors.green,
   },
   primary: {},
   outline: {

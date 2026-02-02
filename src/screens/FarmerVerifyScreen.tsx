@@ -1,64 +1,72 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { AppHeader } from '../components/AppHeader';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { TopNavBar } from '../components/TopNavBar';
-import { useAppTheme } from '../theme/theme';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { TextField } from '../components/TextField';
+import { loadJson, saveJson } from '../storage/localStorage';
+import { colors } from '../theme/colors';
 
 export function FarmerVerifyScreen() {
-  const { colors } = useAppTheme();
-  const tabs = [
-    { label: 'Home', route: 'Home', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
-    { label: 'Verify', route: 'Verify', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
-    { label: 'Products', route: 'Products', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
-    { label: 'Alerts', route: 'Alerts', icon: (color: string) => <Ionicons name="notifications-outline" size={16} color={color} /> },
-    { label: 'Payments', route: 'Payments', icon: (color: string) => <Ionicons name="card-outline" size={16} color={color} /> },
-    { label: 'Profile', route: 'Profile', icon: (color: string) => <Ionicons name="person-outline" size={16} color={color} /> },
-  ];
+  const [barcode, setBarcode] = useState('');
+  const [productName, setProductName] = useState('');
+  const [history, setHistory] = useState<{ barcode: string; productName: string }[]>([]);
+
+  useEffect(() => {
+    loadJson('verification:history', [] as { barcode: string; productName: string }[]).then(setHistory);
+  }, []);
+
+  const handleVerify = async () => {
+    const record = { barcode, productName };
+    const next = [record, ...history].slice(0, 5);
+    setHistory(next);
+    await saveJson('verification:history', next);
+  };
+
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      <AppHeader title="Sincy Farmer" subtitle="Jane Kipchoge" onLogout={() => {}} />
-      <TopNavBar tabs={tabs} />
-      <View style={styles.content}>
-        <View style={[styles.centerCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.cameraIcon, { backgroundColor: colors.greenLight }]}>
-            <Ionicons name="camera-outline" size={38} color={colors.greenPale} />
-          </View>
-          <Text style={[styles.title, { color: colors.text }]}>Ready to Verify?</Text>
-          <Text style={[styles.subtitle, { color: colors.grayMuted }]}>Tap the button below to scan a barcode</Text>
-          <PrimaryButton
-            label="Open Scanner"
-            onPress={() => {}}
-            icon={<Ionicons name="qr-code-outline" size={18} color={colors.white} />}
-          />
+    <ScreenContainer>
+      <Text style={styles.title}>Verify Product</Text>
+      <SectionCard title="Scanner ready">
+        <Text style={styles.bodyText}>Use the camera to scan Code128, EAN-13, or QR codes.</Text>
+      </SectionCard>
+      <SectionCard title="Manual lookup">
+        <Text style={styles.bodyText}>Search by product name or barcode when offline.</Text>
+        <View style={styles.form}>
+          <TextField label="Barcode" value={barcode} onChangeText={setBarcode} keyboardType="numeric" />
+          <TextField label="Product name" value={productName} onChangeText={setProductName} />
+          <PrimaryButton label="Save verification" onPress={handleVerify} />
         </View>
-        <Text style={[styles.manualTitle, { color: colors.text }]}>Or enter manually:</Text>
-        <TextInput
-          placeholder="Enter barcode number"
-          style={[styles.input, { borderColor: colors.border, backgroundColor: colors.card, color: colors.text }]}
-          placeholderTextColor={colors.grayMedium}
-        />
-        <View style={[styles.searchButton, { borderColor: colors.border, backgroundColor: colors.card }]}>
-          <Text style={[styles.searchText, { color: colors.text }]}>Search</Text>
-        </View>
-      </View>
-    </View>
+      </SectionCard>
+      <SectionCard title="Recent verifications">
+        {history.length === 0 ? (
+          <Text style={styles.bodyText}>No offline verifications yet.</Text>
+        ) : (
+          history.map((item, index) => (
+            <Text key={`${item.barcode}-${index}`} style={styles.historyItem}>
+              {item.productName || 'Unknown product'} • {item.barcode || 'No barcode'}
+            </Text>
+          ))
+        )}
+      </SectionCard>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
     gap: 12,
   },
   centerCard: {
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     gap: 10,
   },
@@ -66,6 +74,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
+    backgroundColor: colors.greenLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -75,27 +84,43 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 12,
+    color: colors.grayMuted,
     textAlign: 'center',
   },
   manualTitle: {
     fontSize: 13,
     fontWeight: '600',
+    color: colors.grayDark,
     marginTop: 8,
   },
   input: {
     borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    backgroundColor: colors.white,
+    color: colors.grayDark,
   },
   searchButton: {
     borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: 'center',
+    backgroundColor: colors.white,
   },
   searchText: {
     fontSize: 13,
     fontWeight: '600',
+    color: colors.grayDark,
+  },
+  form: {
+    marginTop: 12,
+  },
+  historyItem: {
+    fontSize: 13,
+    color: colors.grayDark,
+    marginBottom: 6,
   },
 });

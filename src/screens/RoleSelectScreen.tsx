@@ -13,13 +13,13 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <View style={[styles.logoBadge, { backgroundColor: colors.greenPale }]}>
+        <View style={styles.logoBadge}>
           <Ionicons name="flash-outline" size={28} color={colors.greenDark} />
         </View>
-        <Text style={[styles.title, { color: colors.text }]}>Sincy</Text>
-        <Text style={[styles.subtitle, { color: colors.grayMuted }]}>Verify authentic agricultural inputs</Text>
+        <Text style={styles.title}>Sincy</Text>
+        <Text style={styles.subtitle}>Verify authentic agricultural inputs</Text>
       </View>
-      <View style={[styles.card, { backgroundColor: colors.card, shadowColor: colors.grayDark }]}>
+      <View style={styles.card}>
         <PrimaryButton
           label="I'm a Farmer"
           onPress={() => onSelectRole('farmer')}
@@ -32,8 +32,8 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
           icon={<Ionicons name="storefront-outline" size={18} color={colors.green} />}
         />
       </View>
-      <View style={[styles.callout, { backgroundColor: colors.redLight, borderColor: colors.danger }]}>
-        <Text style={[styles.calloutText, { color: colors.text }]}>
+      <View style={styles.callout}>
+        <Text style={styles.calloutText}>
           <Text style={styles.calloutEm}>How it works:</Text> Scan barcodes to verify authenticity and
           build trust in your supply chain.
         </Text>
@@ -59,28 +59,36 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.greenPale,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
+    color: colors.grayDark,
   },
   subtitle: {
     fontSize: 13,
+    color: colors.grayMuted,
   },
   card: {
+    backgroundColor: colors.white,
     padding: 18,
     borderRadius: 18,
+    shadowColor: colors.grayDark,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
   callout: {
+    backgroundColor: colors.redLight,
     padding: 14,
     borderRadius: 12,
     borderWidth: 1,
+    borderColor: '#F2B8BD',
   },
   calloutText: {
     fontSize: 12,
+    color: colors.grayDark,
     textAlign: 'center',
   },
   calloutEm: {

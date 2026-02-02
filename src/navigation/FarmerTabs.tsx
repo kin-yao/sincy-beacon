@@ -29,7 +29,7 @@ export function FarmerTabs() {
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.grayMedium,
         tabBarStyle: {
-          backgroundColor: colors.card,
+          backgroundColor: colors.white,
           borderTopColor: colors.border,
           height: 64,
           paddingBottom: 8,

@@ -1,9 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
-import { TopNavBar } from '../components/TopNavBar';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 export function AgrovetFarmersScreen() {
   const { colors } = useAppTheme();
@@ -16,27 +15,26 @@ export function AgrovetFarmersScreen() {
     { label: 'Settings', route: 'Settings', icon: (color: string) => <Ionicons name="settings-outline" size={16} color={color} /> },
   ];
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={styles.screen}>
       <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
-      <TopNavBar tabs={tabs} />
       <View style={styles.content}>
-        <View style={[styles.farmerCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.avatar, { backgroundColor: colors.greenLight }]}>
+        <View style={styles.farmerCard}>
+          <View style={styles.avatar}>
             <Ionicons name="location-outline" size={16} color={colors.green} />
           </View>
           <View style={styles.farmerBody}>
-            <Text style={[styles.farmerName, { color: colors.text }]}>Jane Kipchoge</Text>
-            <Text style={[styles.farmerMeta, { color: colors.grayMuted }]}>Nakuru · 12 verifications</Text>
+            <Text style={styles.farmerName}>Jane Kipchoge</Text>
+            <Text style={styles.farmerMeta}>Nakuru · 12 verifications</Text>
           </View>
           <Ionicons name="eye-outline" size={16} color={colors.grayMuted} />
         </View>
-        <View style={[styles.farmerCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.avatar, { backgroundColor: colors.greenLight }]}>
+        <View style={styles.farmerCard}>
+          <View style={styles.avatar}>
             <Ionicons name="location-outline" size={16} color={colors.green} />
           </View>
           <View style={styles.farmerBody}>
-            <Text style={[styles.farmerName, { color: colors.text }]}>Samuel Kiplagat</Text>
-            <Text style={[styles.farmerMeta, { color: colors.grayMuted }]}>Eldoret · 8 verifications</Text>
+            <Text style={styles.farmerName}>Samuel Kiplagat</Text>
+            <Text style={styles.farmerMeta}>Eldoret · 8 verifications</Text>
           </View>
           <Ionicons name="eye-outline" size={16} color={colors.grayMuted} />
         </View>
@@ -48,15 +46,18 @@ export function AgrovetFarmersScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
     gap: 12,
   },
   farmerCard: {
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    backgroundColor: colors.greenLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -77,5 +79,6 @@ const styles = StyleSheet.create({
   },
   farmerMeta: {
     fontSize: 11,
+    color: colors.grayMuted,
   },
 });
