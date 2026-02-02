@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   profileTitle: {
     fontSize: 15,
     fontWeight: '700',
+    color: colors.grayDark,
   },
   profileSubtitle: {
     fontSize: 12,

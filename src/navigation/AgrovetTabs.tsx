@@ -7,7 +7,7 @@ import { AgrovetInventoryScreen } from '../screens/AgrovetInventoryScreen';
 import { AgrovetReportsScreen } from '../screens/AgrovetReportsScreen';
 import { AgrovetScanScreen } from '../screens/AgrovetScanScreen';
 import { AgrovetSettingsScreen } from '../screens/AgrovetSettingsScreen';
-import { useAppTheme } from '../theme/theme';
+import { colors } from '../theme/colors';
 
 export type AgrovetTabParamList = {
   Dashboard: undefined;
@@ -21,7 +21,6 @@ export type AgrovetTabParamList = {
 const Tab = createBottomTabNavigator<AgrovetTabParamList>();
 
 export function AgrovetTabs() {
-  const { colors } = useAppTheme();
   return (
     <Tab.Navigator
       screenOptions={{
