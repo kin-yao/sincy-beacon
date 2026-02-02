@@ -1,34 +1,78 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { AppHeader } from '../components/AppHeader';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { TextField } from '../components/TextField';
+import { loadJson, saveJson } from '../storage/localStorage';
 import { colors } from '../theme/colors';
 
 export function AgrovetScanScreen() {
+  const [farmerNid, setFarmerNid] = useState('');
+  const [farmerPhone, setFarmerPhone] = useState('');
+  const [productBarcode, setProductBarcode] = useState('');
+  const [productName, setProductName] = useState('');
+  const [recentFarmers, setRecentFarmers] = useState<{ nid: string; phone: string }[]>([]);
+
+  useEffect(() => {
+    loadJson('agrovet:recentFarmers', [] as { nid: string; phone: string }[]).then(setRecentFarmers);
+  }, []);
+
+  const handleSaveFarmer = async () => {
+    const entry = { nid: farmerNid, phone: farmerPhone };
+    const next = [entry, ...recentFarmers].slice(0, 5);
+    setRecentFarmers(next);
+    await saveJson('agrovet:recentFarmers', next);
+  };
+
+  const handleSaveProduct = async () => {
+    await saveJson('agrovet:lastProduct', { barcode: productBarcode, name: productName });
+  };
+
   return (
-    <View style={styles.screen}>
-      <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
-      <View style={styles.content}>
-        <View style={styles.centerCard}>
-          <View style={styles.cameraIcon}>
-            <Ionicons name="camera-outline" size={38} color={colors.greenPale} />
-          </View>
-          <Text style={styles.title}>Verify Inputs</Text>
-          <Text style={styles.subtitle}>Scan farmer inputs to confirm authenticity.</Text>
-          <PrimaryButton
-            label="Open Scanner"
-            onPress={() => {}}
-            icon={<Ionicons name="qr-code-outline" size={18} color={colors.white} />}
+    <ScreenContainer>
+      <Text style={styles.title}>Scan & Verify</Text>
+      <SectionCard title="Farmer registration">
+        <Text style={styles.bodyText}>Scan National ID to register farmer to your network.</Text>
+        <View style={styles.form}>
+          <TextField
+            label="Farmer National ID"
+            value={farmerNid}
+            onChangeText={setFarmerNid}
+            keyboardType="numeric"
           />
+          <TextField
+            label="Farmer phone"
+            value={farmerPhone}
+            onChangeText={setFarmerPhone}
+            keyboardType="phone-pad"
+          />
+          <PrimaryButton label="Save farmer" onPress={handleSaveFarmer} />
         </View>
-        <Text style={styles.manualTitle}>Or enter manually:</Text>
-        <TextInput placeholder="Enter barcode number" style={styles.input} placeholderTextColor={colors.grayMedium} />
-        <View style={styles.searchButton}>
-          <Text style={styles.searchText}>Search</Text>
+        {recentFarmers.length > 0 && (
+          <View style={styles.list}>
+            {recentFarmers.map((farmer, index) => (
+              <Text key={`${farmer.nid}-${index}`} style={styles.historyItem}>
+                {farmer.nid} • {farmer.phone}
+              </Text>
+            ))}
+          </View>
+        )}
+      </SectionCard>
+      <SectionCard title="Product verification">
+        <Text style={styles.bodyText}>Authenticate barcodes and record transactions instantly.</Text>
+        <View style={styles.form}>
+          <TextField
+            label="Product barcode"
+            value={productBarcode}
+            onChangeText={setProductBarcode}
+            keyboardType="numeric"
+          />
+          <TextField label="Product name" value={productName} onChangeText={setProductName} />
+          <PrimaryButton label="Save product" onPress={handleSaveProduct} />
         </View>
-      </View>
-    </View>
+      </SectionCard>
+    </ScreenContainer>
   );
 }
 
@@ -95,5 +139,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: colors.grayDark,
+  },
+  form: {
+    marginTop: 12,
+  },
+  list: {
+    marginTop: 12,
+  },
+  historyItem: {
+    fontSize: 13,
+    color: colors.grayDark,
+    marginBottom: 6,
   },
 });

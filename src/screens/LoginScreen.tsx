@@ -1,8 +1,10 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
+import { SectionCard } from '../components/SectionCard';
+import { TextField } from '../components/TextField';
+import { loadJson, saveJson } from '../storage/localStorage';
 import { colors } from '../theme/colors';
 
 type LoginScreenProps = {
@@ -11,32 +13,50 @@ type LoginScreenProps = {
 };
 
 export function LoginScreen({ role, onContinue }: LoginScreenProps) {
-  const navigation = useNavigation();
-  const roleLabel = role === 'farmer' ? 'Farmer' : 'Agrovet';
+  const [phone, setPhone] = useState('');
+  const [pin, setPin] = useState('');
+  const [status, setStatus] = useState('Ready');
+
+  useEffect(() => {
+    loadJson<{ phone: string; pin: string }>(`login:${role}`, { phone: '', pin: '' }).then((data) => {
+      setPhone(data.phone);
+      setPin(data.pin);
+    });
+  }, [role]);
+
+  const handleSave = async () => {
+    setStatus('Saving...');
+    await saveJson(`login:${role}`, { phone, pin });
+    setStatus('Saved on device');
+  };
+
   return (
     <ScreenContainer>
-      <Pressable onPress={() => navigation.goBack()} style={styles.back}>
-        <Text style={styles.backText}>← Back</Text>
-      </Pressable>
-      <View style={styles.header}>
-        <Text style={styles.title}>{roleLabel} Sign In</Text>
-        <Text style={styles.subtitle}>Use your phone number and 4-digit PIN.</Text>
-      </View>
-      <View style={styles.formCard}>
-        <View style={styles.field}>
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput placeholder="+254 7XX XXX XXX" style={styles.input} placeholderTextColor={colors.grayMedium} />
+      <Text style={styles.title}>Login</Text>
+      <SectionCard title="Phone & PIN">
+        <Text style={styles.bodyText}>Enter your phone number and 4-digit PIN to access the {role} dashboard.</Text>
+        <View style={styles.form}>
+          <TextField label="Phone number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+          <TextField
+            label="4-digit PIN"
+            value={pin}
+            onChangeText={setPin}
+            keyboardType="numeric"
+            secureTextEntry
+          />
+          <PrimaryButton label="Save login on device" onPress={handleSave} />
+          <Text style={styles.statusText}>{status}</Text>
         </View>
-        <View style={styles.field}>
-          <Text style={styles.label}>PIN (4 digits)</Text>
-          <TextInput placeholder="••••" style={styles.input} placeholderTextColor={colors.grayMedium} secureTextEntry />
-        </View>
-        <PrimaryButton label="Sign In" onPress={onContinue} />
-      </View>
-      <View style={styles.ussdCard}>
-        <Text style={styles.ussdTitle}>Offline access</Text>
-        <Text style={styles.ussdText}>Dial *920# to verify when you are offline.</Text>
-      </View>
+      </SectionCard>
+      <SectionCard title="Offline access">
+        <Text style={styles.bodyText}>USSD fallback: dial *920# to verify if you are offline.</Text>
+      </SectionCard>
+      <SectionCard title="Continue">
+        <Text style={styles.bodyText}>Access your workspace after authentication.</Text>
+        <Text style={styles.link} onPress={onContinue}>
+          Go to dashboard
+        </Text>
+      </SectionCard>
     </ScreenContainer>
   );
 }
@@ -62,19 +82,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: colors.grayMuted,
   },
-  formCard: {
-    backgroundColor: colors.white,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 12,
+  form: {
+    marginTop: 12,
   },
-  field: {
-    gap: 6,
+  statusText: {
+    marginTop: 8,
+    color: colors.greenDark,
+    fontSize: 13,
   },
-  label: {
-    fontSize: 12,
+  link: {
+    marginTop: 8,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.grayDark,
   },
