@@ -1,31 +1,85 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AppHeader } from '../components/AppHeader';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { TopNavBar } from '../components/TopNavBar';
+import { useAppTheme } from '../theme/theme';
 
 export function FarmerPaymentsScreen() {
+  const { colors } = useAppTheme();
+  const tabs = [
+    { label: 'Home', route: 'Home', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
+    { label: 'Verify', route: 'Verify', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
+    { label: 'Products', route: 'Products', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
+    { label: 'Alerts', route: 'Alerts', icon: (color: string) => <Ionicons name="notifications-outline" size={16} color={color} /> },
+    { label: 'Payments', route: 'Payments', icon: (color: string) => <Ionicons name="card-outline" size={16} color={color} /> },
+    { label: 'Profile', route: 'Profile', icon: (color: string) => <Ionicons name="person-outline" size={16} color={color} /> },
+  ];
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Payments</Text>
-      <SectionCard title="M-Pesa status">
-        <Text style={styles.bodyText}>Pending payments are confirmed automatically once received.</Text>
-      </SectionCard>
-      <SectionCard title="SACCO credit">
-        <Text style={styles.bodyText}>View your SACCO balance and repayment schedule.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <AppHeader title="Sincy Farmer" subtitle="Jane Kipchoge" onLogout={() => {}} />
+      <TopNavBar tabs={tabs} />
+      <View style={styles.content}>
+        <View style={[styles.totalCard, { backgroundColor: colors.greenPale, borderColor: colors.green }]}>
+          <Text style={[styles.totalLabel, { color: colors.grayMuted }]}>Total Pending</Text>
+          <Text style={[styles.totalValue, { color: colors.green }]}>KES 4,200</Text>
+        </View>
+        <View style={[styles.paymentCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.paymentHeader}>
+            <View>
+              <Text style={[styles.paymentTitle, { color: colors.text }]}>Payment Reference</Text>
+              <Text style={[styles.paymentMeta, { color: colors.grayMuted }]}>TXN-2024-001 · Jan 20, 2024</Text>
+            </View>
+            <Text style={[styles.paymentStatus, { color: colors.green }]}>Pending</Text>
+          </View>
+          <PrimaryButton label="Confirm M-Pesa Receipt" onPress={() => {}} />
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.grayDark,
+  screen: {
+    flex: 1,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  content: {
+    padding: 16,
+    gap: 12,
+  },
+  totalCard: {
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+  },
+  totalLabel: {
+    fontSize: 12,
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  paymentCard: {
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    gap: 12,
+  },
+  paymentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  paymentTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  paymentMeta: {
+    fontSize: 11,
+  },
+  paymentStatus: {
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

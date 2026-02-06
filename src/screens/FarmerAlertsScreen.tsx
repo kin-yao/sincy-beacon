@@ -1,31 +1,79 @@
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AppHeader } from '../components/AppHeader';
+import { TopNavBar } from '../components/TopNavBar';
+import { useAppTheme } from '../theme/theme';
 
 export function FarmerAlertsScreen() {
+  const { colors } = useAppTheme();
+  const tabs = [
+    { label: 'Home', route: 'Home', icon: (color: string) => <Ionicons name="home-outline" size={16} color={color} /> },
+    { label: 'Verify', route: 'Verify', icon: (color: string) => <Ionicons name="camera-outline" size={16} color={color} /> },
+    { label: 'Products', route: 'Products', icon: (color: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={color} /> },
+    { label: 'Alerts', route: 'Alerts', icon: (color: string) => <Ionicons name="notifications-outline" size={16} color={color} /> },
+    { label: 'Payments', route: 'Payments', icon: (color: string) => <Ionicons name="card-outline" size={16} color={color} /> },
+    { label: 'Profile', route: 'Profile', icon: (color: string) => <Ionicons name="person-outline" size={16} color={color} /> },
+  ];
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Alerts</Text>
-      <SectionCard title="Counterfeit warnings">
-        <Text style={styles.bodyText}>Receive alerts when counterfeit batches are detected nearby.</Text>
-      </SectionCard>
-      <SectionCard title="Sync status">
-        <Text style={styles.bodyText}>Offline cache is up to date. Last sync: 2 hours ago.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <AppHeader title="Sincy Farmer" subtitle="Jane Kipchoge" onLogout={() => {}} />
+      <TopNavBar tabs={tabs} />
+      <View style={styles.content}>
+        <View style={[styles.alertCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.alertIcon, { backgroundColor: colors.grayLight }]}>
+            <Ionicons name="warning-outline" size={18} color={colors.danger} />
+          </View>
+          <View style={styles.alertBody}>
+            <Text style={[styles.alertTitle, { color: colors.text }]}>Counterfeit warning nearby</Text>
+            <Text style={[styles.alertText, { color: colors.grayMuted }]}>Hybrid maize seeds flagged in Nakuru East.</Text>
+          </View>
+        </View>
+        <View style={[styles.alertCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.alertIcon, { backgroundColor: colors.grayLight }]}>
+            <Ionicons name="cloud-done-outline" size={18} color={colors.green} />
+          </View>
+          <View style={styles.alertBody}>
+            <Text style={[styles.alertTitle, { color: colors.text }]}>Offline cache updated</Text>
+            <Text style={[styles.alertText, { color: colors.grayMuted }]}>Last sync completed 2 hours ago.</Text>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.grayDark,
+  screen: {
+    flex: 1,
   },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
+  content: {
+    padding: 16,
+    gap: 12,
+  },
+  alertCard: {
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  alertIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  alertBody: {
+    flex: 1,
+  },
+  alertTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  alertText: {
+    fontSize: 11,
   },
 });

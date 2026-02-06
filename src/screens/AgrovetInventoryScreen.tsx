@@ -1,31 +1,141 @@
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { colors } from '../theme/colors';
+import React, { useMemo, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { TopNavBar } from '../components/TopNavBar';
+import { TopAppBar } from '../components/common/TopAppBar';
+import { SearchBar } from '../components/common/SearchBar';
+import { EmptyState } from '../components/common/EmptyState';
+import { ListItemCard } from '../components/common/ListItemCard';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { useAppTheme } from '../theme/theme';
+import { useOfflineRepo } from '../data/repository';
+import { Product } from '../data/types';
+
+type ViewMode = 'list' | 'detail' | 'add';
 
 export function AgrovetInventoryScreen() {
+  const { colors, toggleTheme } = useAppTheme();
+  const navigation = useNavigation();
+  const { db, refresh, addProduct } = useOfflineRepo();
+  const [search, setSearch] = useState('');
+  const [mode, setMode] = useState<ViewMode>('list');
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [form, setForm] = useState({
+    name: '',
+    barcode: '',
+    category: 'Fertilizer',
+    sacco: 'Tai SACCO',
+    location: 'Nakuru',
+    status: 'verified' as Product['status'],
+  });
+
+  const tabs = [
+    { label: 'Dashboard', route: 'Dashboard', icon: (c: string) => <Ionicons name="home-outline" size={16} color={c} /> },
+    { label: 'Verify', route: 'Scan', icon: (c: string) => <Ionicons name="camera-outline" size={16} color={c} /> },
+    { label: 'Inventory', route: 'Inventory', icon: (c: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={c} /> },
+    { label: 'Farmers', route: 'Farmers', icon: (c: string) => <Ionicons name="people-outline" size={16} color={c} /> },
+    { label: 'Reports', route: 'Reports', icon: (c: string) => <Ionicons name="analytics-outline" size={16} color={c} /> },
+    { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
+  ];
+
+  const filtered = useMemo(
+    () => db.products.filter((item) => `${item.name} ${item.barcode}`.toLowerCase().includes(search.toLowerCase())),
+    [db.products, search],
+  );
+
+  const goToDetail = (item: Product) => {
+    setSelected(item);
+    setMode('detail');
+  };
+
+  const saveProduct = () => {
+    addProduct(form);
+    setForm({ name: '', barcode: '', category: 'Fertilizer', sacco: 'Tai SACCO', location: 'Nakuru', status: 'verified' });
+    setMode('list');
+  };
+
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Inventory</Text>
-      <SectionCard title="Batch tracking">
-        <Text style={styles.bodyText}>Monitor stock levels and batch expiration dates.</Text>
-      </SectionCard>
-      <SectionCard title="Offline cache">
-        <Text style={styles.bodyText}>Ensure the barcode database is synced for offline use.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <TopAppBar
+        title={mode === 'list' ? 'Products List' : mode === 'detail' ? 'Product Details' : 'Add New Product'}
+        subtitle="Offline-first inventory"
+        showBack={mode !== 'list'}
+        actions={mode === 'list' ? [
+          { icon: 'search-outline', onPress: () => {}, accessibilityLabel: 'Search' },
+          { icon: 'add-outline', onPress: () => setMode('add'), accessibilityLabel: 'Add Product' },
+          { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh Data' },
+          { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle Theme' },
+        ] : []}
+      />
+      <TopNavBar tabs={tabs} />
+
+      {mode === 'list' ? (
+        <View style={styles.content}>
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search product name or barcode" />
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.green} />}
+            renderItem={({ item }) => (
+              <ListItemCard
+                title={item.name}
+                subtitle={`${item.barcode} • ${item.location}`}
+                tag={`${item.sacco} • ${new Date(item.updatedAt).toLocaleDateString()}`}
+                status={item.status}
+                onPress={() => goToDetail(item)}
+              />
+            )}
+            ListEmptyComponent={
+              <EmptyState
+                title="No products yet"
+                message="Bado hakuna bidhaa hapa. Tap + kuongeza bidhaa kama DAP Fertilizer 50kg."
+              />
+            }
+          />
+        </View>
+      ) : null}
+
+      {mode === 'detail' && selected ? (
+        <View style={styles.content}>
+          <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.detailTitle, { color: colors.text }]}>{selected.name}</Text>
+            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Barcode: {selected.barcode}</Text>
+            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Category: {selected.category}</Text>
+            <Text style={[styles.detailText, { color: colors.grayMuted }]}>SACCO: {selected.sacco}</Text>
+            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Location: {selected.location}</Text>
+            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Updated: {new Date(selected.updatedAt).toLocaleString()}</Text>
+          </View>
+          <PrimaryButton label="Back to Products" onPress={() => setMode('list')} />
+        </View>
+      ) : null}
+
+      {mode === 'add' ? (
+        <View style={styles.content}>
+          <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.text }]}>Product Name</Text>
+            <TextInput value={form.name} onChangeText={(v) => setForm((p) => ({ ...p, name: v }))} placeholder="e.g., DAP Fertilizer 50kg" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+            <Text style={[styles.label, { color: colors.text }]}>Barcode</Text>
+            <TextInput value={form.barcode} onChangeText={(v) => setForm((p) => ({ ...p, barcode: v }))} placeholder="e.g., 616100100010" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+            <Text style={[styles.label, { color: colors.text }]}>Location</Text>
+            <TextInput value={form.location} onChangeText={(v) => setForm((p) => ({ ...p, location: v }))} placeholder="Nakuru" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+          </View>
+          <PrimaryButton label="Save Product Offline" onPress={saveProduct} />
+          <PrimaryButton label="Cancel" onPress={() => setMode('list')} variant="outline" />
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.grayDark,
-  },
-  bodyText: {
-    fontSize: 14,
-    color: colors.grayDark,
-  },
+  screen: { flex: 1 },
+  content: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, gap: 10 },
+  listContent: { gap: 8, paddingVertical: 8 },
+  detailCard: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 8 },
+  detailTitle: { fontSize: 18, fontWeight: '700' },
+  detailText: { fontSize: 14 },
+  label: { fontSize: 14, fontWeight: '600' },
+  input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 10, fontSize: 14 },
 });
