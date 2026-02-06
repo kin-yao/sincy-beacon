@@ -1,78 +1,116 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AppHeader } from '../components/AppHeader';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { TopNavBar } from '../components/TopNavBar';
+import { useAppTheme } from '../theme/theme';
 import { loadJson } from '../storage/localStorage';
-import { colors } from '../theme/colors';
+
+type FarmerProfile = {
+  name: string;
+  nid: string;
+  phone: string;
+  sacco: string;
+  location?: string;
+  language?: string;
+};
 
 export function FarmerProfileScreen() {
-  const [profile, setProfile] = useState({ name: '', nid: '', phone: '', sacco: '' });
+  const { colors } = useAppTheme();
+
+  const [profile, setProfile] = useState<FarmerProfile>({
+    name: 'Jane Kipchoge',
+    nid: '12345678',
+    phone: '+254700000000',
+    sacco: 'Kagema SACCO',
+    location: 'Nakuru Town',
+    language: 'English',
+  });
 
   useEffect(() => {
-    loadJson('signup:farmer', profile).then(setProfile);
+    loadJson<FarmerProfile>('signup:farmer', profile).then(setProfile).catch(() => {
+      // keep defaults if storage missing
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const tabs = [
+    { label: 'Home', route: 'Home', icon: (c: string) => <Ionicons name="home-outline" size={16} color={c} /> },
+    { label: 'Verify', route: 'Verify', icon: (c: string) => <Ionicons name="camera-outline" size={16} color={c} /> },
+    { label: 'Products', route: 'Products', icon: (c: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={c} /> },
+    { label: 'Alerts', route: 'Alerts', icon: (c: string) => <Ionicons name="notifications-outline" size={16} color={c} /> },
+    { label: 'Payments', route: 'Payments', icon: (c: string) => <Ionicons name="card-outline" size={16} color={c} /> },
+    { label: 'Profile', route: 'Profile', icon: (c: string) => <Ionicons name="person-outline" size={16} color={c} /> },
+  ];
+
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Profile</Text>
-      <SectionCard title="Farmer details">
-        <Text style={styles.bodyText}>National ID, phone, and SACCO membership information.</Text>
-        <Text style={styles.detailText}>Name: {profile.name || 'Not set'}</Text>
-        <Text style={styles.detailText}>National ID: {profile.nid || 'Not set'}</Text>
-        <Text style={styles.detailText}>Phone: {profile.phone || 'Not set'}</Text>
-        <Text style={styles.detailText}>SACCO: {profile.sacco || 'Not set'}</Text>
-      </SectionCard>
-      <SectionCard title="Security">
-        <Text style={styles.bodyText}>Change PIN and manage device access.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <AppHeader title="Sincy Farmer" subtitle={profile.name || 'Farmer'} onLogout={() => {}} />
+      <TopNavBar tabs={tabs} />
+
+      <View style={styles.content}>
+        <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.profileTitle, { color: colors.text }]}>{profile.name || 'Not set'}</Text>
+          <Text style={[styles.profileSubtitle, { color: colors.grayMuted }]}>
+            {profile.sacco ? `${profile.sacco} Member` : 'SACCO not set'}
+          </Text>
+
+          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>Location</Text>
+            <Text style={[styles.profileValue, { color: colors.text }]}>{profile.location || 'Not set'}</Text>
+          </View>
+
+          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>National ID</Text>
+            <Text style={[styles.profileValue, { color: colors.text }]}>{profile.nid || 'Not set'}</Text>
+          </View>
+
+          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>Phone</Text>
+            <Text style={[styles.profileValue, { color: colors.text }]}>{profile.phone || 'Not set'}</Text>
+          </View>
+
+          <View style={[styles.profileRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.profileLabel, { color: colors.grayMuted }]}>Language</Text>
+            <Text style={[styles.profileValue, { color: colors.text }]}>{profile.language || 'English'}</Text>
+          </View>
+
+          <PrimaryButton label="Logout" onPress={() => {}} variant="outline" />
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.grayLight,
-  },
-  content: {
-    padding: 16,
-  },
+  screen: { flex: 1 },
+  content: { padding: 16 },
+
   profileCard: {
-    backgroundColor: colors.white,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: 12,
   },
   profileTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   profileSubtitle: {
     fontSize: 12,
-    color: colors.grayMuted,
   },
   profileRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     paddingVertical: 8,
   },
   profileLabel: {
     fontSize: 12,
-    color: colors.grayMuted,
   },
   profileValue: {
     fontSize: 12,
-    color: colors.grayDark,
     fontWeight: '600',
-  },
-  detailText: {
-    fontSize: 13,
-    color: colors.grayDark,
-    marginTop: 6,
   },
 });

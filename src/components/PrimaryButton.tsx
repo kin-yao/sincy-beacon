@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type PrimaryButtonProps = {
   label: string;
@@ -9,20 +9,31 @@ type PrimaryButtonProps = {
   icon?: React.ReactNode;
 };
 
-export function PrimaryButton({ label, onPress, variant = 'primary', icon }: PrimaryButtonProps) {
+export function PrimaryButton({
+  label,
+  onPress,
+  variant = 'primary',
+  icon,
+}: PrimaryButtonProps) {
+  const { colors } = useAppTheme();
+
+  const isPrimary = variant === 'primary';
+
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        variant === 'primary' ? styles.primary : styles.outline,
+        isPrimary
+          ? [styles.primary, { backgroundColor: colors.green }]
+          : [styles.outline, { borderColor: colors.green, backgroundColor: colors.card }],
         pressed && styles.pressed,
       ]}
     >
       <View style={styles.content}>
         {icon ? <View style={styles.icon}>{icon}</View> : null}
-        <Text style={[styles.label, variant === 'primary' ? styles.labelPrimary : styles.labelOutline]}>
+        <Text style={[styles.label, { color: isPrimary ? colors.white : colors.green }]}>
           {label}
         </Text>
       </View>
@@ -48,12 +59,10 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   primary: {
-    backgroundColor: colors.green,
+    // keep only layout-related styles here (no colors)
   },
   outline: {
     borderWidth: 2,
-    borderColor: colors.green,
-    backgroundColor: colors.white,
   },
   pressed: {
     opacity: 0.8,
@@ -61,11 +70,5 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  labelPrimary: {
-    color: colors.white,
-  },
-  labelOutline: {
-    color: colors.green,
   },
 });

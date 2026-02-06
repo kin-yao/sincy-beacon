@@ -1,83 +1,106 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AppHeader } from '../components/AppHeader';
+import { PrimaryButton } from '../components/PrimaryButton';
+import { TopNavBar } from '../components/TopNavBar';
+import { useAppTheme } from '../theme/theme';
 import { loadJson } from '../storage/localStorage';
-import { colors } from '../theme/colors';
+
+type AgrovetProfile = {
+  storeName: string;
+  ownerName: string;
+  license: string;
+  location: string;
+};
 
 export function AgrovetSettingsScreen() {
-  const [profile, setProfile] = useState({
-    storeName: '',
-    ownerName: '',
-    license: '',
-    location: '',
+  const { colors } = useAppTheme();
+
+  const [profile, setProfile] = useState<AgrovetProfile>({
+    storeName: 'Green Farm Agrovet',
+    ownerName: 'Not set',
+    license: 'Active',
+    location: 'Nakuru Town',
   });
 
   useEffect(() => {
-    loadJson('signup:agrovet', profile).then(setProfile);
+    loadJson<AgrovetProfile>('signup:agrovet', profile).then(setProfile).catch(() => {
+      // ignore and keep defaults
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const tabs = [
+    { label: 'Dashboard', route: 'Dashboard', icon: (c: string) => <Ionicons name="home-outline" size={16} color={c} /> },
+    { label: 'Verify', route: 'Scan', icon: (c: string) => <Ionicons name="camera-outline" size={16} color={c} /> },
+    { label: 'Inventory', route: 'Inventory', icon: (c: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={c} /> },
+    { label: 'Farmers', route: 'Farmers', icon: (c: string) => <Ionicons name="people-outline" size={16} color={c} /> },
+    { label: 'Reports', route: 'Reports', icon: (c: string) => <Ionicons name="analytics-outline" size={16} color={c} /> },
+    { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
+  ];
+
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Settings</Text>
-      <SectionCard title="Store profile">
-        <Text style={styles.bodyText}>Update business license, store details, and location.</Text>
-        <Text style={styles.detailText}>Store: {profile.storeName || 'Not set'}</Text>
-        <Text style={styles.detailText}>Owner: {profile.ownerName || 'Not set'}</Text>
-        <Text style={styles.detailText}>License: {profile.license || 'Not set'}</Text>
-        <Text style={styles.detailText}>Location: {profile.location || 'Not set'}</Text>
-      </SectionCard>
-      <SectionCard title="Security">
-        <Text style={styles.bodyText}>Manage PIN access and device permissions.</Text>
-      </SectionCard>
-    </ScreenContainer>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <AppHeader title="Sincy Agrovet" subtitle={profile.storeName || 'Agrovet'} onLogout={() => {}} />
+      <TopNavBar tabs={tabs} />
+
+      <View style={styles.content}>
+        <View style={[styles.settingsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>{profile.storeName || 'Not set'}</Text>
+          <Text style={[styles.cardSubtitle, { color: colors.grayMuted }]}>
+            Owner: {profile.ownerName || 'Not set'}
+          </Text>
+
+          <View style={[styles.row, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.grayMuted }]}>Location</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.location || 'Not set'}</Text>
+          </View>
+
+          <View style={[styles.row, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.grayMuted }]}>License</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{profile.license || 'Not set'}</Text>
+          </View>
+
+          <View style={[styles.row, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.label, { color: colors.grayMuted }]}>Language</Text>
+            <Text style={[styles.value, { color: colors.text }]}>English</Text>
+          </View>
+
+          <PrimaryButton label="Logout" onPress={() => {}} />
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.grayLight,
-  },
-  content: {
-    padding: 16,
-  },
+  screen: { flex: 1 },
+  content: { padding: 16 },
   settingsCard: {
-    backgroundColor: colors.white,
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: 12,
   },
   cardTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   cardSubtitle: {
     fontSize: 12,
-    color: colors.grayMuted,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     paddingVertical: 8,
   },
   label: {
     fontSize: 12,
-    color: colors.grayMuted,
   },
   value: {
     fontSize: 12,
-    color: colors.grayDark,
     fontWeight: '600',
-  },
-  detailText: {
-    fontSize: 13,
-    color: colors.grayDark,
-    marginTop: 6,
   },
 });

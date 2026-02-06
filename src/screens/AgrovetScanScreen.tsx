@@ -1,154 +1,226 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { TopNavBar } from '../components/TopNavBar';
+import { TopAppBar } from '../components/common/TopAppBar';
+import { SearchBar } from '../components/common/SearchBar';
+import { EmptyState } from '../components/common/EmptyState';
+import { ListItemCard } from '../components/common/ListItemCard';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { TextField } from '../components/TextField';
-import { loadJson, saveJson } from '../storage/localStorage';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
+import { useOfflineRepo } from '../data/repository';
+import { ScanHistory, Product } from '../data/types';
+
+type ViewMode = 'scan' | 'detail' | 'addProduct';
 
 export function AgrovetScanScreen() {
-  const [farmerNid, setFarmerNid] = useState('');
-  const [farmerPhone, setFarmerPhone] = useState('');
-  const [productBarcode, setProductBarcode] = useState('');
-  const [productName, setProductName] = useState('');
-  const [recentFarmers, setRecentFarmers] = useState<{ nid: string; phone: string }[]>([]);
+  const { colors, toggleTheme } = useAppTheme();
+  const { db, refresh, addScan, addProduct } = useOfflineRepo();
 
-  useEffect(() => {
-    loadJson('agrovet:recentFarmers', [] as { nid: string; phone: string }[]).then(setRecentFarmers);
-  }, []);
+  const [mode, setMode] = useState<ViewMode>('scan');
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [newProductName, setNewProductName] = useState('');
+  const [search, setSearch] = useState('');
+  const [selected, setSelected] = useState<ScanHistory | null>(null);
 
-  const handleSaveFarmer = async () => {
-    const entry = { nid: farmerNid, phone: farmerPhone };
-    const next = [entry, ...recentFarmers].slice(0, 5);
-    setRecentFarmers(next);
-    await saveJson('agrovet:recentFarmers', next);
+  const tabs = [
+    { label: 'Dashboard', route: 'Dashboard', icon: (c: string) => <Ionicons name="home-outline" size={16} color={c} /> },
+    { label: 'Verify', route: 'Scan', icon: (c: string) => <Ionicons name="camera-outline" size={16} color={c} /> },
+    { label: 'Inventory', route: 'Inventory', icon: (c: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={c} /> },
+    { label: 'Farmers', route: 'Farmers', icon: (c: string) => <Ionicons name="people-outline" size={16} color={c} /> },
+    { label: 'Reports', route: 'Reports', icon: (c: string) => <Ionicons name="analytics-outline" size={16} color={c} /> },
+    { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
+  ];
+
+  const filteredScans = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return db.scans;
+
+    return db.scans.filter((item) =>
+      `${item.barcode} ${item.notes ?? ''}`.toLowerCase().includes(q),
+    );
+  }, [db.scans, search]);
+
+  const runScan = () => {
+    const barcode = barcodeInput.trim();
+    if (!barcode) return;
+
+    const found: Product | undefined = db.products.find((p) => p.barcode === barcode);
+
+    if (found) {
+      addScan({
+        barcode,
+        productId: found.id,
+        result: 'matched',
+        notes: `Matched ${found.name}`,
+      });
+
+      setBarcodeInput('');
+      setMode('scan');
+      return;
+    }
+
+    addScan({
+      barcode,
+      result: 'not_found',
+      notes: 'Product not found in local DB',
+    });
+
+    setMode('addProduct');
   };
 
-  const handleSaveProduct = async () => {
-    await saveJson('agrovet:lastProduct', { barcode: productBarcode, name: productName });
+  const saveProductFromScan = () => {
+    const barcode = barcodeInput.trim();
+    const name = newProductName.trim();
+    if (!barcode || !name) return;
+
+    addProduct({
+      name,
+      barcode,
+      category: 'Fertilizer',
+      sacco: 'Tai SACCO',
+      location: 'Nakuru',
+      status: 'verified',
+    });
+
+    setNewProductName('');
+    setBarcodeInput('');
+    setMode('scan');
+  };
+
+  const goBack = () => {
+    setMode('scan');
+    setSelected(null);
   };
 
   return (
-    <ScreenContainer>
-      <Text style={styles.title}>Scan & Verify</Text>
-      <SectionCard title="Farmer registration">
-        <Text style={styles.bodyText}>Scan National ID to register farmer to your network.</Text>
-        <View style={styles.form}>
-          <TextField
-            label="Farmer National ID"
-            value={farmerNid}
-            onChangeText={setFarmerNid}
-            keyboardType="numeric"
-          />
-          <TextField
-            label="Farmer phone"
-            value={farmerPhone}
-            onChangeText={setFarmerPhone}
-            keyboardType="phone-pad"
-          />
-          <PrimaryButton label="Save farmer" onPress={handleSaveFarmer} />
-        </View>
-        {recentFarmers.length > 0 && (
-          <View style={styles.list}>
-            {recentFarmers.map((farmer, index) => (
-              <Text key={`${farmer.nid}-${index}`} style={styles.historyItem}>
-                {farmer.nid} • {farmer.phone}
-              </Text>
-            ))}
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <TopAppBar
+        title={
+          mode === 'scan'
+            ? 'Scan Product'
+            : mode === 'detail'
+              ? 'Scan Details'
+              : 'Add Product'
+        }
+        subtitle="Works offline with local records"
+        showBack={mode !== 'scan'}
+        onBackPress={goBack}
+        actions={
+          mode === 'scan'
+            ? [
+                { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh local scan history' },
+                { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle theme' },
+              ]
+            : []
+        }
+      />
+
+      <TopNavBar tabs={tabs} />
+
+      {mode === 'scan' ? (
+        <View style={styles.content}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.title, { color: colors.text }]}>Camera Scan (Placeholder)</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>
+              Use manual barcode input for now, then we’ll plug in the camera scanner.
+            </Text>
+
+            <TextInput
+              value={barcodeInput}
+              onChangeText={setBarcodeInput}
+              placeholder="Enter or paste barcode"
+              placeholderTextColor={colors.grayMedium}
+              keyboardType="number-pad"
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+            />
+
+            <PrimaryButton
+              label="Scan / Match Product"
+              onPress={runScan}
+              icon={<Ionicons name="scan-outline" size={18} color={colors.white} />}
+            />
           </View>
-        )}
-      </SectionCard>
-      <SectionCard title="Product verification">
-        <Text style={styles.bodyText}>Authenticate barcodes and record transactions instantly.</Text>
-        <View style={styles.form}>
-          <TextField
-            label="Product barcode"
-            value={productBarcode}
-            onChangeText={setProductBarcode}
-            keyboardType="numeric"
+
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Filter scan history by barcode/notes" />
+
+          <FlatList
+            data={filteredScans}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.green} />}
+            renderItem={({ item }) => (
+              <ListItemCard
+                title={`Barcode ${item.barcode}`}
+                subtitle={item.notes || 'No notes'}
+                tag={new Date(item.scannedAt).toLocaleString()}
+                status={item.result === 'matched' ? 'matched' : 'not found'}
+                onPress={() => {
+                  setSelected(item);
+                  setMode('detail');
+                }}
+              />
+            )}
+            ListEmptyComponent={
+              <EmptyState
+                title="No scan history yet"
+                message="Scan ya kwanza itatokea hapa. Jaribu barcode ya demo data kama 616100100010."
+              />
+            }
           />
-          <TextField label="Product name" value={productName} onChangeText={setProductName} />
-          <PrimaryButton label="Save product" onPress={handleSaveProduct} />
         </View>
-      </SectionCard>
-    </ScreenContainer>
+      ) : null}
+
+      {mode === 'detail' && selected ? (
+        <View style={styles.content}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.title, { color: colors.text }]}>Scan Record</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Barcode: {selected.barcode}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Result: {selected.result}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Notes: {selected.notes || '—'}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>
+              Time: {new Date(selected.scannedAt).toLocaleString()}
+            </Text>
+          </View>
+
+          <PrimaryButton label="Back to Scan" onPress={goBack} />
+        </View>
+      ) : null}
+
+      {mode === 'addProduct' ? (
+        <View style={styles.content}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.title, { color: colors.text }]}>Product not found</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>
+              No product for barcode {barcodeInput || '-'} in local DB. Add it now.
+            </Text>
+
+            <Text style={[styles.label, { color: colors.text }]}>Product Name</Text>
+            <TextInput
+              value={newProductName}
+              onChangeText={setNewProductName}
+              placeholder="e.g., Topdress Fertilizer"
+              placeholderTextColor={colors.grayMedium}
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+            />
+          </View>
+
+          <PrimaryButton label="Save Product & Continue" onPress={saveProductFromScan} />
+          <PrimaryButton label="Cancel" onPress={goBack} variant="outline" />
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.grayLight,
-  },
-  content: {
-    padding: 16,
-    gap: 12,
-  },
-  centerCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    gap: 10,
-  },
-  cameraIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: colors.greenLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.grayDark,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: colors.grayMuted,
-    textAlign: 'center',
-  },
-  manualTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.grayDark,
-    marginTop: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: colors.white,
-    color: colors.grayDark,
-  },
-  searchButton: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    backgroundColor: colors.white,
-  },
-  searchText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.grayDark,
-  },
-  form: {
-    marginTop: 12,
-  },
-  list: {
-    marginTop: 12,
-  },
-  historyItem: {
-    fontSize: 13,
-    color: colors.grayDark,
-    marginBottom: 6,
-  },
+  screen: { flex: 1 },
+  content: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, gap: 10 },
+  listContent: { gap: 8, paddingVertical: 8 },
+
+  card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 8 },
+  title: { fontSize: 18, fontWeight: '700' },
+  text: { fontSize: 14 },
+  label: { fontSize: 14, fontWeight: '600' },
+  input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 10, fontSize: 14 },
 });

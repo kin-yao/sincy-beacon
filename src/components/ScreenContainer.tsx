@@ -1,14 +1,15 @@
 import React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type ScreenContainerProps = {
   children: React.ReactNode;
 };
 
 export function ScreenContainer({ children }: ScreenContainerProps) {
+  const { colors } = useAppTheme();
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.inner}>{children}</View>
       </ScrollView>
@@ -19,7 +20,6 @@ export function ScreenContainer({ children }: ScreenContainerProps) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 20,

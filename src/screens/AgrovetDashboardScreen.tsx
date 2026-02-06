@@ -2,49 +2,72 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
-import { colors } from '../theme/colors';
+import { TopNavBar } from '../components/TopNavBar';
+import { useAppTheme } from '../theme/theme';
 
 export function AgrovetDashboardScreen() {
+  const { colors } = useAppTheme();
+
+  const tabs = [
+    { label: 'Dashboard', route: 'Dashboard', icon: (c: string) => <Ionicons name="home-outline" size={16} color={c} /> },
+    { label: 'Verify', route: 'Scan', icon: (c: string) => <Ionicons name="camera-outline" size={16} color={c} /> },
+    { label: 'Inventory', route: 'Inventory', icon: (c: string) => <MaterialCommunityIcons name="cube-outline" size={16} color={c} /> },
+    { label: 'Farmers', route: 'Farmers', icon: (c: string) => <Ionicons name="people-outline" size={16} color={c} /> },
+    { label: 'Reports', route: 'Reports', icon: (c: string) => <Ionicons name="analytics-outline" size={16} color={c} /> },
+    { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
+  ];
+
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <AppHeader title="Sincy Agrovet" subtitle="Green Farm Agrovet" onLogout={() => {}} />
+      <TopNavBar tabs={tabs} />
+
       <View style={styles.content}>
-        <View style={styles.topStats}>
+        {/* Top Stats */}
+        <View style={[styles.topStats, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={styles.topStat}>
-            <Text style={styles.topLabel}>Today's Sales</Text>
-            <Text style={styles.topValue}>15</Text>
+            <Text style={[styles.topLabel, { color: colors.grayMuted }]}>Today's Sales</Text>
+            <Text style={[styles.topValue, { color: colors.green }]}>15</Text>
           </View>
           <View style={styles.topStat}>
-            <Text style={styles.topLabel}>Verified</Text>
-            <Text style={styles.topValue}>12</Text>
+            <Text style={[styles.topLabel, { color: colors.grayMuted }]}>Verified</Text>
+            <Text style={[styles.topValue, { color: colors.green }]}>12</Text>
           </View>
           <View style={styles.topStat}>
-            <Text style={styles.topLabel}>Farmers</Text>
-            <Text style={styles.topValue}>487</Text>
+            <Text style={[styles.topLabel, { color: colors.grayMuted }]}>Farmers</Text>
+            <Text style={[styles.topValue, { color: colors.green }]}>487</Text>
           </View>
         </View>
+
+        {/* Cards */}
         <View style={styles.statRow}>
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <MaterialCommunityIcons name="chart-line" size={18} color={colors.green} />
-            <Text style={styles.cardValue}>KES 42.5k</Text>
-            <Text style={styles.cardLabel}>Revenue</Text>
+            <Text style={[styles.cardValue, { color: colors.text }]}>KES 42.5k</Text>
+            <Text style={[styles.cardLabel, { color: colors.grayMuted }]}>Revenue</Text>
           </View>
-          <View style={styles.card}>
+
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <MaterialCommunityIcons name="cube-outline" size={18} color={colors.danger} />
-            <Text style={[styles.cardValue, styles.cardDanger]}>8</Text>
-            <Text style={styles.cardLabel}>Low Stock</Text>
+            <Text style={[styles.cardValue, { color: colors.danger }]}>8</Text>
+            <Text style={[styles.cardLabel, { color: colors.grayMuted }]}>Low Stock</Text>
           </View>
         </View>
-        <Text style={styles.sectionTitle}>Recent Verifications</Text>
-        <View style={styles.activityCard}>
-          <View style={styles.activityIcon}>
+
+        {/* Recent Activity */}
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Verifications</Text>
+
+        <View style={[styles.activityCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.activityIcon, { backgroundColor: colors.greenLight }]}>
             <Ionicons name="checkmark-circle" size={18} color={colors.green} />
           </View>
+
           <View style={styles.activityBody}>
-            <Text style={styles.activityTitle}>Jane Kipchoge</Text>
-            <Text style={styles.activitySubtitle}>Verified NPK 23:23:0</Text>
+            <Text style={[styles.activityTitle, { color: colors.text }]}>Jane Kipchoge</Text>
+            <Text style={[styles.activitySubtitle, { color: colors.grayMuted }]}>Verified NPK 23:23:0</Text>
           </View>
-          <Text style={styles.activityTime}>15 min</Text>
+
+          <Text style={[styles.activityTime, { color: colors.grayMuted }]}>15 min</Text>
         </View>
       </View>
     </View>
@@ -54,7 +77,6 @@ export function AgrovetDashboardScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.grayLight,
   },
   content: {
     padding: 16,
@@ -62,10 +84,8 @@ const styles = StyleSheet.create({
   },
   topStats: {
     flexDirection: 'row',
-    backgroundColor: colors.white,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
     paddingVertical: 12,
   },
   topStat: {
@@ -75,12 +95,10 @@ const styles = StyleSheet.create({
   },
   topLabel: {
     fontSize: 11,
-    color: colors.grayMuted,
   },
   topValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.green,
   },
   statRow: {
     flexDirection: 'row',
@@ -88,36 +106,26 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: 6,
   },
   cardValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.grayDark,
-  },
-  cardDanger: {
-    color: colors.danger,
   },
   cardLabel: {
     fontSize: 11,
-    color: colors.grayMuted,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   activityCard: {
-    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -126,7 +134,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.greenLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -136,14 +143,11 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.grayDark,
   },
   activitySubtitle: {
     fontSize: 11,
-    color: colors.grayMuted,
   },
   activityTime: {
     fontSize: 10,
-    color: colors.grayMuted,
   },
 });

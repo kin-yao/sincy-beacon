@@ -2,27 +2,42 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 type RoleSelectScreenProps = {
   onSelectRole: (role: 'farmer' | 'agrovet') => void;
 };
 
 export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
+  const { colors } = useAppTheme();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <View style={styles.logoBadge}>
+        <View style={[styles.logoBadge, { backgroundColor: colors.greenPale }]}>
           <Ionicons name="flash-outline" size={28} color={colors.greenDark} />
         </View>
-        <Text style={styles.title}>Sincy</Text>
-        <Text style={styles.subtitle}>Verify authentic agricultural inputs</Text>
+
+        <Text style={[styles.title, { color: colors.text }]}>Sincy</Text>
+        <Text style={[styles.subtitle, { color: colors.grayMuted }]}>
+          Verify authentic agricultural inputs
+        </Text>
       </View>
-      <View style={styles.card}>
+
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            shadowColor: colors.grayDark,
+          },
+        ]}
+      >
         <PrimaryButton
           label="I'm a Farmer"
           onPress={() => onSelectRole('farmer')}
-          icon={<MaterialCommunityIcons name="cube-outline" size={18} color={colors.white} />}
+          icon={<MaterialCommunityIcons name="sprout" size={18} color={colors.white} />}
         />
         <PrimaryButton
           label="I'm an Agrovet"
@@ -31,8 +46,9 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
           icon={<Ionicons name="storefront-outline" size={18} color={colors.green} />}
         />
       </View>
-      <View style={styles.callout}>
-        <Text style={styles.calloutText}>
+
+      <View style={[styles.callout, { backgroundColor: colors.greenPale, borderColor: colors.green }]}>
+        <Text style={[styles.calloutText, { color: colors.text }]}>
           <Text style={styles.calloutEm}>How it works:</Text> Scan barcodes to verify authenticity and
           build trust in your supply chain.
         </Text>
@@ -44,10 +60,9 @@ export function RoleSelectScreen({ onSelectRole }: RoleSelectScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.grayLight,
     padding: 24,
     justifyContent: 'center',
-    gap: 24,
+    gap: 18,
   },
   header: {
     alignItems: 'center',
@@ -59,37 +74,34 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.greenPale,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   subtitle: {
     fontSize: 13,
-    color: colors.grayMuted,
+    textAlign: 'center',
+    lineHeight: 18,
   },
   card: {
-    backgroundColor: colors.white,
     padding: 18,
     borderRadius: 18,
-    shadowColor: colors.grayDark,
+    borderWidth: 1,
+    gap: 12,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
   callout: {
-    backgroundColor: colors.redLight,
     padding: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#F2B8BD',
   },
   calloutText: {
     fontSize: 12,
-    color: colors.grayDark,
     textAlign: 'center',
+    lineHeight: 18,
   },
   calloutEm: {
     fontWeight: '700',

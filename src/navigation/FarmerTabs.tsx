@@ -7,7 +7,7 @@ import { FarmerPaymentsScreen } from '../screens/FarmerPaymentsScreen';
 import { FarmerProductsScreen } from '../screens/FarmerProductsScreen';
 import { FarmerProfileScreen } from '../screens/FarmerProfileScreen';
 import { FarmerVerifyScreen } from '../screens/FarmerVerifyScreen';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../theme/theme';
 
 export type FarmerTabParamList = {
   Home: undefined;
@@ -21,14 +21,17 @@ export type FarmerTabParamList = {
 const Tab = createBottomTabNavigator<FarmerTabParamList>();
 
 export function FarmerTabs() {
+  const { colors } = useAppTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.grayMedium,
         tabBarStyle: {
-          backgroundColor: colors.white,
+          backgroundColor: colors.card,
           borderTopColor: colors.border,
           height: 64,
           paddingBottom: 8,
@@ -43,42 +46,54 @@ export function FarmerTabs() {
         name="Home"
         component={FarmerHomeScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Verify"
         component={FarmerVerifyScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="camera-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="camera-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Products"
         component={FarmerProductsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="cube-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cube-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Alerts"
         component={FarmerAlertsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="notifications-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Payments"
         component={FarmerPaymentsScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="card-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="card-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
         name="Profile"
         component={FarmerProfileScreen}
         options={{
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>

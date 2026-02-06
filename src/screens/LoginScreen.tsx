@@ -1,62 +1,112 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { SectionCard } from '../components/SectionCard';
-import { TextField } from '../components/TextField';
+import { useAppTheme } from '../theme/theme';
 import { loadJson, saveJson } from '../storage/localStorage';
-import { colors } from '../theme/colors';
 
 type LoginScreenProps = {
   role: 'farmer' | 'agrovet';
   onContinue: () => void;
 };
 
+type SavedLogin = { phone: string; pin: string };
+
 export function LoginScreen({ role, onContinue }: LoginScreenProps) {
+  const navigation = useNavigation();
+  const { colors } = useAppTheme();
+
+  const roleLabel = role === 'farmer' ? 'Farmer' : 'Agrovet';
+
   const [phone, setPhone] = useState('');
   const [pin, setPin] = useState('');
-  const [status, setStatus] = useState('Ready');
+  const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   useEffect(() => {
-    loadJson<{ phone: string; pin: string }>(`login:${role}`, { phone: '', pin: '' }).then((data) => {
-      setPhone(data.phone);
-      setPin(data.pin);
-    });
+    loadJson<SavedLogin>(`login:${role}`, { phone: '', pin: '' })
+      .then((data) => {
+        setPhone(data?.phone ?? '');
+        setPin(data?.pin ?? '');
+      })
+      .catch(() => {
+        // ignore if nothing saved yet
+      });
   }, [role]);
 
-  const handleSave = async () => {
-    setStatus('Saving...');
-    await saveJson(`login:${role}`, { phone, pin });
-    setStatus('Saved on device');
+  const handleSignIn = async () => {
+    // Save locally so user can still access when offline later
+    setStatus('saving');
+    try {
+      await saveJson(`login:${role}`, { phone: phone.trim(), pin: pin.trim() });
+      setStatus('saved');
+    } catch {
+      setStatus('idle');
+    }
+    onContinue();
   };
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Login</Text>
-      <SectionCard title="Phone & PIN">
-        <Text style={styles.bodyText}>Enter your phone number and 4-digit PIN to access the {role} dashboard.</Text>
-        <View style={styles.form}>
-          <TextField label="Phone number" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-          <TextField
-            label="4-digit PIN"
+      <Pressable onPress={() => navigation.goBack()} style={styles.back} accessibilityRole="button">
+        <Text style={[styles.backText, { color: colors.grayMuted }]}>← Back</Text>
+      </Pressable>
+
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: colors.text }]}>{roleLabel} Sign In</Text>
+        <Text style={[styles.subtitle, { color: colors.grayMuted }]}>
+          Use your phone number and 4-digit PIN.
+        </Text>
+      </View>
+
+      <View style={[styles.formCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>Phone Number</Text>
+          <TextInput
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="+254 7XX XXX XXX"
+            keyboardType="phone-pad"
+            placeholderTextColor={colors.grayMedium}
+            style={[
+              styles.input,
+              { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text },
+            ]}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>PIN (4 digits)</Text>
+          <TextInput
             value={pin}
             onChangeText={setPin}
-            keyboardType="numeric"
+            placeholder="••••"
+            keyboardType="number-pad"
+            maxLength={4}
             secureTextEntry
+            placeholderTextColor={colors.grayMedium}
+            style={[
+              styles.input,
+              { borderColor: colors.border, backgroundColor: colors.grayLight, color: colors.text },
+            ]}
           />
-          <PrimaryButton label="Save login on device" onPress={handleSave} />
-          <Text style={styles.statusText}>{status}</Text>
         </View>
-      </SectionCard>
-      <SectionCard title="Offline access">
-        <Text style={styles.bodyText}>USSD fallback: dial *920# to verify if you are offline.</Text>
-      </SectionCard>
-      <SectionCard title="Continue">
-        <Text style={styles.bodyText}>Access your workspace after authentication.</Text>
-        <Text style={styles.link} onPress={onContinue}>
-          Go to dashboard
+
+        {status === 'saving' ? (
+          <Text style={[styles.statusText, { color: colors.grayMuted }]}>Saving on device…</Text>
+        ) : status === 'saved' ? (
+          <Text style={[styles.statusText, { color: colors.green }]}>Saved for offline use ✔</Text>
+        ) : null}
+
+        <PrimaryButton label="Sign In" onPress={handleSignIn} />
+      </View>
+
+      <View style={[styles.ussdCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.ussdTitle, { color: colors.text }]}>Offline access</Text>
+        <Text style={[styles.ussdText, { color: colors.grayMuted }]}>
+          Dial *920# to verify when you are offline.
         </Text>
-      </SectionCard>
+      </View>
     </ScreenContainer>
   );
 }
@@ -66,60 +116,61 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   backText: {
-    color: colors.grayMuted,
     fontSize: 14,
   },
   header: {
     alignItems: 'center',
     gap: 6,
+    marginBottom: 10,
   },
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   subtitle: {
     fontSize: 13,
-    color: colors.grayMuted,
+    textAlign: 'center',
+    lineHeight: 18,
   },
-  form: {
-    marginTop: 12,
+
+  formCard: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 12,
   },
-  statusText: {
-    marginTop: 8,
-    color: colors.greenDark,
-    fontSize: 13,
+  field: {
+    gap: 6,
   },
-  link: {
-    marginTop: 8,
-    fontSize: 14,
+  label: {
+    fontSize: 12,
     fontWeight: '600',
-    color: colors.grayDark,
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: colors.grayLight,
-    color: colors.grayDark,
+    fontSize: 14,
   },
+  statusText: {
+    marginTop: 2,
+    fontSize: 12,
+  },
+
   ussdCard: {
-    backgroundColor: colors.white,
+    marginTop: 12,
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   ussdTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.grayDark,
   },
   ussdText: {
     fontSize: 12,
-    color: colors.grayMuted,
     marginTop: 4,
+    lineHeight: 18,
   },
 });
