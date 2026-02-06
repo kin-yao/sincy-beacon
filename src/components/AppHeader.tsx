@@ -15,15 +15,32 @@ export function AppHeader({ title, subtitle, onLogout }: AppHeaderProps) {
 
   return (
     <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: colors.card }]}>
-      <View style={[styles.container, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: colors.card, borderBottomColor: colors.border },
+        ]}
+      >
         <View>
           <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          {subtitle ? <Text style={[styles.subtitle, { color: colors.grayMuted }]}>{subtitle}</Text> : null}
+          {subtitle ? (
+            <Text style={[styles.subtitle, { color: colors.grayMuted }]}>{subtitle}</Text>
+          ) : null}
         </View>
+
         <View style={styles.actions}>
-          <Pressable style={[styles.iconButton, { backgroundColor: colors.grayLight }]} onPress={toggleTheme}>
-            <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={18} color={colors.text} />
+          <Pressable
+            style={[styles.iconButton, { backgroundColor: colors.grayLight }]}
+            onPress={toggleTheme}
+            accessibilityRole="button"
+          >
+            <Ionicons
+              name={isDark ? 'sunny-outline' : 'moon-outline'}
+              size={18}
+              color={colors.text}
+            />
           </Pressable>
+
           {onLogout ? (
             <Pressable
               style={[styles.iconButton, { backgroundColor: colors.grayLight }]}

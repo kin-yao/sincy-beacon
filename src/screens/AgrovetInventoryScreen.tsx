@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { TopNavBar } from '../components/TopNavBar';
 import { TopAppBar } from '../components/common/TopAppBar';
 import { SearchBar } from '../components/common/SearchBar';
@@ -16,8 +15,8 @@ type ViewMode = 'list' | 'detail' | 'add';
 
 export function AgrovetInventoryScreen() {
   const { colors, toggleTheme } = useAppTheme();
-  const navigation = useNavigation();
   const { db, refresh, addProduct } = useOfflineRepo();
+
   const [search, setSearch] = useState('');
   const [mode, setMode] = useState<ViewMode>('list');
   const [selected, setSelected] = useState<Product | null>(null);
@@ -39,10 +38,25 @@ export function AgrovetInventoryScreen() {
     { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
   ];
 
-  const filtered = useMemo(
-    () => db.products.filter((item) => `${item.name} ${item.barcode}`.toLowerCase().includes(search.toLowerCase())),
-    [db.products, search],
-  );
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return db.products;
+
+    return db.products.filter((item) =>
+      `${item.name} ${item.barcode}`.toLowerCase().includes(q),
+    );
+  }, [db.products, search]);
+
+  const resetForm = () => {
+    setForm({
+      name: '',
+      barcode: '',
+      category: 'Fertilizer',
+      sacco: 'Tai SACCO',
+      location: 'Nakuru',
+      status: 'verified',
+    });
+  };
 
   const goToDetail = (item: Product) => {
     setSelected(item);
@@ -50,29 +64,46 @@ export function AgrovetInventoryScreen() {
   };
 
   const saveProduct = () => {
+    if (!form.name.trim() || !form.barcode.trim()) return;
+
     addProduct(form);
-    setForm({ name: '', barcode: '', category: 'Fertilizer', sacco: 'Tai SACCO', location: 'Nakuru', status: 'verified' });
+    resetForm();
     setMode('list');
   };
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <TopAppBar
-        title={mode === 'list' ? 'Products List' : mode === 'detail' ? 'Product Details' : 'Add New Product'}
+        title={
+          mode === 'list'
+            ? 'Products'
+            : mode === 'detail'
+              ? 'Product Details'
+              : 'Add Product'
+        }
         subtitle="Offline-first inventory"
         showBack={mode !== 'list'}
-        actions={mode === 'list' ? [
-          { icon: 'search-outline', onPress: () => {}, accessibilityLabel: 'Search' },
-          { icon: 'add-outline', onPress: () => setMode('add'), accessibilityLabel: 'Add Product' },
-          { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh Data' },
-          { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle Theme' },
-        ] : []}
+        onBackPress={() => {
+          setMode('list');
+          setSelected(null);
+        }}
+        actions={
+          mode === 'list'
+            ? [
+                { icon: 'add-outline', onPress: () => { resetForm(); setMode('add'); }, accessibilityLabel: 'Add Product' },
+                { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh Data' },
+                { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle Theme' },
+              ]
+            : []
+        }
       />
+
       <TopNavBar tabs={tabs} />
 
       {mode === 'list' ? (
         <View style={styles.content}>
           <SearchBar value={search} onChangeText={setSearch} placeholder="Search product name or barcode" />
+
           <FlatList
             data={filtered}
             keyExtractor={(item) => item.id}
@@ -99,28 +130,52 @@ export function AgrovetInventoryScreen() {
 
       {mode === 'detail' && selected ? (
         <View style={styles.content}>
-          <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.detailTitle, { color: colors.text }]}>{selected.name}</Text>
-            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Barcode: {selected.barcode}</Text>
-            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Category: {selected.category}</Text>
-            <Text style={[styles.detailText, { color: colors.grayMuted }]}>SACCO: {selected.sacco}</Text>
-            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Location: {selected.location}</Text>
-            <Text style={[styles.detailText, { color: colors.grayMuted }]}>Updated: {new Date(selected.updatedAt).toLocaleString()}</Text>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.title, { color: colors.text }]}>{selected.name}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Barcode: {selected.barcode}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Category: {selected.category}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>SACCO: {selected.sacco}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Location: {selected.location}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>
+              Updated: {new Date(selected.updatedAt).toLocaleString()}
+            </Text>
           </View>
-          <PrimaryButton label="Back to Products" onPress={() => setMode('list')} />
+
+          <PrimaryButton label="Back to Products" onPress={() => { setSelected(null); setMode('list'); }} />
         </View>
       ) : null}
 
       {mode === 'add' ? (
         <View style={styles.content}>
-          <View style={[styles.detailCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.label, { color: colors.text }]}>Product Name</Text>
-            <TextInput value={form.name} onChangeText={(v) => setForm((p) => ({ ...p, name: v }))} placeholder="e.g., DAP Fertilizer 50kg" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+            <TextInput
+              value={form.name}
+              onChangeText={(v) => setForm((p) => ({ ...p, name: v }))}
+              placeholder="e.g., DAP Fertilizer 50kg"
+              placeholderTextColor={colors.grayMedium}
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+            />
+
             <Text style={[styles.label, { color: colors.text }]}>Barcode</Text>
-            <TextInput value={form.barcode} onChangeText={(v) => setForm((p) => ({ ...p, barcode: v }))} placeholder="e.g., 616100100010" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+            <TextInput
+              value={form.barcode}
+              onChangeText={(v) => setForm((p) => ({ ...p, barcode: v }))}
+              placeholder="e.g., 616100100010"
+              placeholderTextColor={colors.grayMedium}
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+            />
+
             <Text style={[styles.label, { color: colors.text }]}>Location</Text>
-            <TextInput value={form.location} onChangeText={(v) => setForm((p) => ({ ...p, location: v }))} placeholder="Nakuru" placeholderTextColor={colors.grayMedium} style={[styles.input, { borderColor: colors.border, color: colors.text }]} />
+            <TextInput
+              value={form.location}
+              onChangeText={(v) => setForm((p) => ({ ...p, location: v }))}
+              placeholder="Nakuru"
+              placeholderTextColor={colors.grayMedium}
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+            />
           </View>
+
           <PrimaryButton label="Save Product Offline" onPress={saveProduct} />
           <PrimaryButton label="Cancel" onPress={() => setMode('list')} variant="outline" />
         </View>
@@ -133,9 +188,10 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, gap: 10 },
   listContent: { gap: 8, paddingVertical: 8 },
-  detailCard: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 8 },
-  detailTitle: { fontSize: 18, fontWeight: '700' },
-  detailText: { fontSize: 14 },
+
+  card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 8 },
+  title: { fontSize: 18, fontWeight: '700' },
+  text: { fontSize: 14 },
   label: { fontSize: 14, fontWeight: '600' },
   input: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 10, fontSize: 14 },
 });

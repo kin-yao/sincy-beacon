@@ -14,6 +14,7 @@ import { ScanHistory } from '../data/types';
 export function AgrovetReportsScreen() {
   const { colors, toggleTheme } = useAppTheme();
   const { db, refresh } = useOfflineRepo();
+
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<ScanHistory | null>(null);
 
@@ -26,28 +27,38 @@ export function AgrovetReportsScreen() {
     { label: 'Settings', route: 'Settings', icon: (c: string) => <Ionicons name="settings-outline" size={16} color={c} /> },
   ];
 
-  const filtered = useMemo(
-    () => db.scans.filter((item) => `${item.barcode} ${item.notes}`.toLowerCase().includes(search.toLowerCase())),
-    [db.scans, search],
-  );
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return db.scans;
+
+    return db.scans.filter((item) =>
+      `${item.barcode} ${item.notes ?? ''}`.toLowerCase().includes(q),
+    );
+  }, [db.scans, search]);
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <TopAppBar
-        title={selected ? 'Scan Details' : 'Scan History List'}
+        title={selected ? 'Scan Details' : 'Scan History'}
         subtitle="Offline reports"
         showBack={!!selected}
         onBackPress={() => setSelected(null)}
-        actions={!selected ? [
-          { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh history' },
-          { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle theme' },
-        ] : []}
+        actions={
+          !selected
+            ? [
+                { icon: 'sync-outline', onPress: refresh, accessibilityLabel: 'Refresh history' },
+                { icon: 'moon-outline', onPress: toggleTheme, accessibilityLabel: 'Toggle theme' },
+              ]
+            : []
+        }
       />
+
       <TopNavBar tabs={tabs} />
 
       {!selected ? (
         <View style={styles.content}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search by barcode" />
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search by barcode or notes" />
+
           <FlatList
             data={filtered}
             keyExtractor={(item) => item.id}
@@ -56,23 +67,31 @@ export function AgrovetReportsScreen() {
             renderItem={({ item }) => (
               <ListItemCard
                 title={`Barcode ${item.barcode}`}
-                subtitle={item.notes}
+                subtitle={item.notes || 'No notes'}
                 tag={new Date(item.scannedAt).toLocaleString()}
                 status={item.result === 'matched' ? 'matched' : 'not found'}
                 onPress={() => setSelected(item)}
               />
             )}
-            ListEmptyComponent={<EmptyState title="No scan reports" message="Hakuna report bado. Fanya verification kwanza ili historia ionekane hapa." />}
+            ListEmptyComponent={
+              <EmptyState
+                title="No scan reports"
+                message="Hakuna report bado. Fanya verification kwanza ili historia ionekane hapa."
+              />
+            }
           />
         </View>
       ) : (
         <View style={styles.content}>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}> 
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.title, { color: colors.text }]}>Barcode {selected.barcode}</Text>
             <Text style={[styles.text, { color: colors.grayMuted }]}>Result: {selected.result}</Text>
-            <Text style={[styles.text, { color: colors.grayMuted }]}>Notes: {selected.notes}</Text>
-            <Text style={[styles.text, { color: colors.grayMuted }]}>Scanned: {new Date(selected.scannedAt).toLocaleString()}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>Notes: {selected.notes || '—'}</Text>
+            <Text style={[styles.text, { color: colors.grayMuted }]}>
+              Scanned: {new Date(selected.scannedAt).toLocaleString()}
+            </Text>
           </View>
+
           <PrimaryButton label="Back to History" onPress={() => setSelected(null)} />
         </View>
       )}
